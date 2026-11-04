@@ -1,10 +1,12 @@
 import { ValidationPipe } from '@nestjs/common';
 import { NestFactory } from '@nestjs/core';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
-import { AppModule } from './app.module.js';
+import { AppModule, ObserveInstrument } from './app.module.js';
 
 async function bootstrap() {
-  const app = await NestFactory.create(AppModule);
+  const app = await NestFactory.create(AppModule, {
+    instrument: ObserveInstrument,
+  });
 
   // Enable global validation with stripping of unlisted properties
   app.useGlobalPipes(

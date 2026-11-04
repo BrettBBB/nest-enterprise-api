@@ -20,5 +20,8 @@ describe('password hashing', () => {
     await expect(verifyPassword('ChangeMe123', 'not-a-hash')).resolves.toBe(
       false,
     );
+    await expect(verifyPassword('ChangeMe123', 'ChangeMe123')).resolves.toBe(
+      false,
+    );
   });
 });

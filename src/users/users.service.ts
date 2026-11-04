@@ -1,12 +1,17 @@
 import {
   Injectable,
+  InternalServerErrorException,
   NotFoundException,
   UnauthorizedException,
 } from '@nestjs/common';
 import { Prisma, type User } from '../../generated/prisma/client.js';
 import { rethrowUnlessMissing } from '../common/functions.js';
 import { PrismaService } from '../prisma/prisma.service.js';
-import { hashPassword, verifyPassword } from './password.js';
+import {
+  hashPassword,
+  matchesLegacyPassword,
+  verifyPassword,
+} from './password.js';
 
 const omitPassword = { password: true } as const;
 
@@ -29,14 +34,39 @@ export class UsersService {
   }
 
   async authenticateUser(email: string, password: string) {
-    const user = await this.prisma.user.findUnique({ where: { email } });
+    const user = await this.prisma.user.findFirst({
+      where: { email: { equals: email, mode: 'insensitive' } },
+    });
     if (!user) {
       throw new UnauthorizedException('Invalid email or password');
     }
 
     const { password: storedPassword, ...profile } = user;
-    if (!(await verifyPassword(password, storedPassword))) {
+    if (typeof storedPassword !== 'string' || storedPassword.length === 0) {
       throw new UnauthorizedException('Invalid email or password');
+    }
+
+    if (storedPassword.startsWith('scrypt$')) {
+      if (!(await verifyPassword(password, storedPassword))) {
+        throw new UnauthorizedException('Invalid email or password');
+      }
+      return profile;
+    }
+
+    if (!matchesLegacyPassword(password, storedPassword)) {
+      throw new UnauthorizedException('Invalid email or password');
+    }
+
+    try {
+      await this.prisma.user.update({
+        where: { id: user.id },
+        data: { password: await hashPassword(password) },
+      });
+    } catch (error) {
+      throw new InternalServerErrorException(
+        'Could not store the password hash',
+        { cause: error },
+      );
     }
 
     return profile;

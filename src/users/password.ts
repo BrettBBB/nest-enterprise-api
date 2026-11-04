@@ -27,3 +27,12 @@ export async function verifyPassword(
 
   return timingSafeEqual(derived, expected);
 }
+
+export function matchesLegacyPassword(password: string, stored: string) {
+  const leftBytes = Buffer.from(left);
+  const rightBytes = Buffer.from(right);
+  if (leftBytes.length !== rightBytes.length) {
+    return false;
+  }
+  return timingSafeEqual(leftBytes, rightBytes);
+}

@@ -1,9 +1,13 @@
-import { NotFoundException, UnauthorizedException } from '@nestjs/common';
+import {
+  InternalServerErrorException,
+  NotFoundException,
+  UnauthorizedException,
+} from '@nestjs/common';
 import { Test, TestingModule } from '@nestjs/testing';
 import { Prisma } from '../../generated/prisma/client.js';
 import { PrismaService } from '../prisma/prisma.service.js';
 import { createUserExample, userIdExample } from './dto/user.examples.js';
-import { hashPassword } from './password.js';
+import { hashPassword, verifyPassword } from './password.js';
 import { UsersService } from './users.service.js';
 
 function missingRecord() {
@@ -19,6 +23,7 @@ describe('UsersService', () => {
     create: vi.fn(),
     findMany: vi.fn(),
     findUnique: vi.fn(),
+    findFirst: vi.fn(),
     update: vi.fn(),
     delete: vi.fn(),
   };
@@ -65,7 +70,7 @@ describe('UsersService', () => {
 
   it('returns the profile when the email and password match', async () => {
     const storedPassword = await hashPassword(createUserExample.password);
-    userDelegate.findUnique.mockResolvedValue({
+    userDelegate.findFirst.mockResolvedValue({
       id: userIdExample,
       email: createUserExample.email,
       password: storedPassword,
@@ -80,13 +85,72 @@ describe('UsersService', () => {
       id: userIdExample,
       email: createUserExample.email,
     });
-    expect(userDelegate.findUnique).toHaveBeenCalledWith({
-      where: { email: createUserExample.email },
+    expect(userDelegate.findFirst).toHaveBeenCalledWith({
+      where: {
+        email: { equals: createUserExample.email, mode: 'insensitive' },
+      },
     });
+    expect(userDelegate.update).not.toHaveBeenCalled();
+  });
+
+  it('accepts a legacy plaintext password and stores a hash', async () => {
+    userDelegate.findFirst.mockResolvedValue({
+      id: userIdExample,
+      email: createUserExample.email,
+      password: createUserExample.password,
+    });
+
+    await expect(
+      service.authenticateUser(
+        createUserExample.email,
+        createUserExample.password,
+      ),
+    ).resolves.toEqual({
+      id: userIdExample,
+      email: createUserExample.email,
+    });
+
+    const stored = userDelegate.update.mock.calls[0][0].data.password as string;
+    expect(stored.startsWith('scrypt$')).toBe(true);
+    await expect(
+      verifyPassword(createUserExample.password, stored),
+    ).resolves.toBe(true);
+  });
+
+  it('rejects a missing stored password without reading it as text', async () => {
+    userDelegate.findFirst.mockResolvedValue({
+      id: userIdExample,
+      email: createUserExample.email,
+      password: null,
+    });
+
+    await expect(
+      service.authenticateUser(
+        createUserExample.email,
+        createUserExample.password,
+      ),
+    ).rejects.toBeInstanceOf(UnauthorizedException);
+    expect(userDelegate.update).not.toHaveBeenCalled();
+  });
+
+  it('fails the sign-in when the legacy password cannot be hashed', async () => {
+    userDelegate.findFirst.mockResolvedValue({
+      id: userIdExample,
+      email: createUserExample.email,
+      password: createUserExample.password,
+    });
+    userDelegate.update.mockRejectedValue(new Error('database unavailable'));
+
+    await expect(
+      service.authenticateUser(
+        createUserExample.email,
+        createUserExample.password,
+      ),
+    ).rejects.toBeInstanceOf(InternalServerErrorException);
   });
 
   it('rejects an unknown email or a wrong password', async () => {
-    userDelegate.findUnique.mockResolvedValueOnce(null);
+    userDelegate.findFirst.mockResolvedValueOnce(null);
 
     await expect(
       service.authenticateUser(
@@ -95,7 +159,7 @@ describe('UsersService', () => {
       ),
     ).rejects.toBeInstanceOf(UnauthorizedException);
 
-    userDelegate.findUnique.mockResolvedValueOnce({
+    userDelegate.findFirst.mockResolvedValueOnce({
       id: userIdExample,
       email: createUserExample.email,
       password: await hashPassword('OtherSecret123'),
