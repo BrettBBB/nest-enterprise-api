@@ -28,8 +28,11 @@ async function bootstrap() {
   const document = SwaggerModule.createDocument(app, config);
   SwaggerModule.setup('api', app, document); // Accessible at http://localhost:3000/api
 
-  await app.listen(3000);
+  // Enable shutdown hooks to listen for SIGTERM, SIGINT, etc.
+  app.enableShutdownHooks();
+
+  await app.listen(process.env.PORT || 3000);
   console.log(`Application is running on: ${await app.getUrl()}`);
   console.log(`Swagger docs available at: ${await app.getUrl()}/api`);
 }
-bootstrap();
+void bootstrap();
