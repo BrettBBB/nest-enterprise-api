@@ -6,7 +6,7 @@ alwaysApply: false
 
 # DTOs and Swagger
 
-Request DTOs use `class-validator` and `@ApiProperty` / `@ApiPropertyOptional`. Shared sample values live in `dto/<resource>.examples.ts` and are the only examples Swagger shows.
+Request DTOs use `class-validator` and `@ApiProperty` / `@ApiPropertyOptional`. Trim string fields with `trimString` from `src/common/functions.ts`. Shared sample values live in `dto/<resource>.examples.ts` and are the only examples Swagger shows.
 
 - Create: required fields, `@ApiBody({ type, examples })`
 - Update: optional fields, its own class (not `PartialType`), with a partial sample

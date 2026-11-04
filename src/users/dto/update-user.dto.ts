@@ -1,28 +1,38 @@
-import { IsEmail, IsInt, IsOptional, IsString, Max, Min, MinLength } from 'class-validator';
-import { Transform } from 'class-transformer';
 import { ApiPropertyOptional } from '@nestjs/swagger';
-import { updateUserExample } from './user.examples.js';
+import { Transform, Type } from 'class-transformer';
+import {
+  IsEmail,
+  IsInt,
+  IsOptional,
+  IsString,
+  Max,
+  Min,
+  MinLength,
+} from 'class-validator';
+import { trimString } from '../../common/functions.js';
+import { createUserExample, updateUserExample } from './user.examples.js';
 
 export class UpdateUserDto {
   @ApiPropertyOptional({ example: updateUserExample.firstName })
   @IsOptional()
   @IsString()
-  @Transform(({ value }) => (typeof value === 'string' ? value.trim() : value))
+  @Transform(trimString)
   firstName?: string;
 
   @ApiPropertyOptional({ example: updateUserExample.lastName })
   @IsOptional()
   @IsString()
-  @Transform(({ value }) => (typeof value === 'string' ? value.trim() : value))
+  @Transform(trimString)
   lastName?: string;
 
   @ApiPropertyOptional({ example: updateUserExample.email, format: 'email' })
   @IsOptional()
   @IsEmail()
+  @Transform(trimString)
   email?: string;
 
   @ApiPropertyOptional({
-    example: 'ChangeMe123',
+    example: createUserExample.password,
     minLength: 8,
     description: 'Password must be at least 8 characters long',
   })
@@ -31,10 +41,15 @@ export class UpdateUserDto {
   @MinLength(8, { message: 'Password must be at least 8 characters long' })
   password?: string;
 
-  @ApiPropertyOptional({ example: updateUserExample.age, minimum: 0, maximum: 120 })
+  @ApiPropertyOptional({
+    example: updateUserExample.age,
+    minimum: 0,
+    maximum: 120,
+  })
   @IsOptional()
   @IsInt()
   @Min(0)
   @Max(120)
+  @Type(() => Number)
   age?: number;
 }

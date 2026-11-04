@@ -23,3 +23,4 @@ async createUser(data: Prisma.UserCreateInput) {
 - `DATABASE_URL` and `SHADOW_DATABASE_URL` are `postgres://` URLs in `.env`, read by `prisma7.config.ts`.
 - Start local Postgres with `pnpm exec prisma dev -d` before migrate or the API. The `pg` adapter cannot use a `prisma+postgres://` URL.
 - `PrismaService` throws if `DATABASE_URL` is missing. Do not construct it in a unit test.
+- Catch a missing Prisma record with `rethrowUnlessMissing(error, 'User not found')` from `src/common/functions.ts`.

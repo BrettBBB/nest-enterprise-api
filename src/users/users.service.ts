@@ -1,5 +1,6 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { Prisma, type User } from '../../generated/prisma/client.js';
+import { rethrowUnlessMissing } from '../common/functions.js';
 import { PrismaService } from '../prisma/prisma.service.js';
 import { hashPassword } from './password.js';
 
@@ -23,11 +24,15 @@ export class UsersService {
     return this.prisma.user.findMany({ omit: omitPassword });
   }
 
-  findUserById(id: User['id']) {
-    return this.prisma.user.findUnique({
+  async findUserById(id: User['id']) {
+    const user = await this.prisma.user.findUnique({
       where: { id },
       omit: omitPassword,
     });
+    if (!user) {
+      throw new NotFoundException('User not found');
+    }
+    return user;
   }
 
   async updateUser(id: User['id'], data: Prisma.UserUpdateInput) {
@@ -36,17 +41,25 @@ export class UsersService {
         ? await hashPassword(data.password)
         : data.password;
 
-    return this.prisma.user.update({
-      where: { id },
-      data: { ...data, password },
-      omit: omitPassword,
-    });
+    try {
+      return await this.prisma.user.update({
+        where: { id },
+        data: { ...data, password },
+        omit: omitPassword,
+      });
+    } catch (error) {
+      rethrowUnlessMissing(error, 'User not found');
+    }
   }
 
-  deleteUser(id: User['id']) {
-    return this.prisma.user.delete({
-      where: { id },
-      omit: omitPassword,
-    });
+  async deleteUser(id: User['id']) {
+    try {
+      return await this.prisma.user.delete({
+        where: { id },
+        omit: omitPassword,
+      });
+    } catch (error) {
+      rethrowUnlessMissing(error, 'User not found');
+    }
   }
 }

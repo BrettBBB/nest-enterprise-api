@@ -10,24 +10,26 @@ import {
   Min,
   MinLength,
 } from 'class-validator';
+import { trimString } from '../../common/functions.js';
 import { createUserExample } from './user.examples.js';
 
 export class CreateUserDto {
   @ApiProperty({ example: createUserExample.firstName })
   @IsString()
   @IsNotEmpty()
-  @Transform(({ value }) => (typeof value === 'string' ? value.trim() : value))
+  @Transform(trimString)
   firstName: string;
 
   @ApiProperty({ example: createUserExample.lastName })
   @IsString()
   @IsNotEmpty()
-  @Transform(({ value }) => (typeof value === 'string' ? value.trim() : value))
+  @Transform(trimString)
   lastName: string;
 
   @ApiProperty({ example: createUserExample.email, format: 'email' })
   @IsEmail()
   @IsNotEmpty()
+  @Transform(trimString)
   email: string;
 
   @ApiProperty({
@@ -49,6 +51,6 @@ export class CreateUserDto {
   @IsInt()
   @Min(0)
   @Max(120)
-  @Type(() => Number) // Safely casts "32" to 32
+  @Type(() => Number)
   age?: number;
 }

@@ -18,12 +18,14 @@ describe('CreateUserDto', () => {
       ...createUserExample,
       firstName: '  Ada  ',
       lastName: ' Lovelace ',
+      email: '  ada@example.com  ',
       age: '36',
     });
 
     expect(await validate(dto)).toEqual([]);
     expect(dto.firstName).toBe('Ada');
     expect(dto.lastName).toBe('Lovelace');
+    expect(dto.email).toBe('ada@example.com');
     expect(dto.age).toBe(36);
   });
 
@@ -46,9 +48,13 @@ describe('CreateUserDto', () => {
 describe('UpdateUserDto', () => {
   it('accepts an empty body and a partial update', async () => {
     expect(await validationErrors(UpdateUserDto, {})).toEqual([]);
-    expect(
-      await validationErrors(UpdateUserDto, { firstName: 'Augusta' }),
-    ).toEqual([]);
+    const dto = plainToInstance(UpdateUserDto, {
+      firstName: '  Augusta  ',
+      age: '37',
+    });
+    expect(await validate(dto)).toEqual([]);
+    expect(dto.firstName).toBe('Augusta');
+    expect(dto.age).toBe(37);
   });
 
   it('rejects a short replacement password and a non-email address', async () => {
@@ -68,9 +74,12 @@ describe('UserIdParamDto', () => {
     expect(await validationErrors(UserIdParamDto, { id: userIdExample })).toEqual([]);
   });
 
-  it('rejects an empty id', async () => {
-    const errors = await validationErrors(UserIdParamDto, { id: '' });
+  it('trims a user id and rejects a blank one', async () => {
+    const dto = plainToInstance(UserIdParamDto, { id: `  ${userIdExample}  ` });
+    expect(await validate(dto)).toEqual([]);
+    expect(dto.id).toBe(userIdExample);
 
+    const errors = await validationErrors(UserIdParamDto, { id: '   ' });
     expect(errors.map((error) => error.property)).toContain('id');
   });
 });

@@ -1,8 +1,16 @@
+import { NotFoundException } from '@nestjs/common';
 import { Test, TestingModule } from '@nestjs/testing';
 import { Prisma } from '../../generated/prisma/client.js';
 import { PrismaService } from '../prisma/prisma.service.js';
 import { createUserExample, userIdExample } from './dto/user.examples.js';
 import { UsersService } from './users.service.js';
+
+function missingRecord() {
+  return new Prisma.PrismaClientKnownRequestError('No record found', {
+    code: 'P2025',
+    clientVersion: 'test',
+  });
+}
 
 describe('UsersService', () => {
   let service: UsersService;
@@ -55,13 +63,30 @@ describe('UsersService', () => {
   });
 
   it('loads one user by id without returning the password', async () => {
-    userDelegate.findUnique.mockResolvedValue(null);
+    const stored = { id: userIdExample };
+    userDelegate.findUnique.mockResolvedValue(stored);
 
-    await expect(service.findUserById(userIdExample)).resolves.toBeNull();
+    await expect(service.findUserById(userIdExample)).resolves.toBe(stored);
     expect(userDelegate.findUnique).toHaveBeenCalledWith({
       where: { id: userIdExample },
       omit: { password: true },
     });
+  });
+
+  it('reports a missing user as not found', async () => {
+    userDelegate.findUnique.mockResolvedValue(null);
+    userDelegate.update.mockRejectedValue(missingRecord());
+    userDelegate.delete.mockRejectedValue(missingRecord());
+
+    await expect(service.findUserById(userIdExample)).rejects.toBeInstanceOf(
+      NotFoundException,
+    );
+    await expect(
+      service.updateUser(userIdExample, { firstName: 'Augusta' }),
+    ).rejects.toBeInstanceOf(NotFoundException);
+    await expect(service.deleteUser(userIdExample)).rejects.toBeInstanceOf(
+      NotFoundException,
+    );
   });
 
   it('hashes a replacement password on update', async () => {
