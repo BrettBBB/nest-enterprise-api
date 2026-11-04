@@ -1,8 +1,12 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import {
+  Injectable,
+  NotFoundException,
+  UnauthorizedException,
+} from '@nestjs/common';
 import { Prisma, type User } from '../../generated/prisma/client.js';
 import { rethrowUnlessMissing } from '../common/functions.js';
 import { PrismaService } from '../prisma/prisma.service.js';
-import { hashPassword } from './password.js';
+import { hashPassword, verifyPassword } from './password.js';
 
 const omitPassword = { password: true } as const;
 
@@ -22,6 +26,20 @@ export class UsersService {
 
   findAllUsers() {
     return this.prisma.user.findMany({ omit: omitPassword });
+  }
+
+  async authenticateUser(email: string, password: string) {
+    const user = await this.prisma.user.findUnique({ where: { email } });
+    if (!user) {
+      throw new UnauthorizedException('Invalid email or password');
+    }
+
+    const { password: storedPassword, ...profile } = user;
+    if (!(await verifyPassword(password, storedPassword))) {
+      throw new UnauthorizedException('Invalid email or password');
+    }
+
+    return profile;
   }
 
   async findUserById(id: User['id']) {

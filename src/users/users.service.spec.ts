@@ -1,8 +1,9 @@
-import { NotFoundException } from '@nestjs/common';
+import { NotFoundException, UnauthorizedException } from '@nestjs/common';
 import { Test, TestingModule } from '@nestjs/testing';
 import { Prisma } from '../../generated/prisma/client.js';
 import { PrismaService } from '../prisma/prisma.service.js';
 import { createUserExample, userIdExample } from './dto/user.examples.js';
+import { hashPassword } from './password.js';
 import { UsersService } from './users.service.js';
 
 function missingRecord() {
@@ -60,6 +61,52 @@ describe('UsersService', () => {
     expect(userDelegate.findMany).toHaveBeenCalledWith({
       omit: { password: true },
     });
+  });
+
+  it('returns the profile when the email and password match', async () => {
+    const storedPassword = await hashPassword(createUserExample.password);
+    userDelegate.findUnique.mockResolvedValue({
+      id: userIdExample,
+      email: createUserExample.email,
+      password: storedPassword,
+    });
+
+    await expect(
+      service.authenticateUser(
+        createUserExample.email,
+        createUserExample.password,
+      ),
+    ).resolves.toEqual({
+      id: userIdExample,
+      email: createUserExample.email,
+    });
+    expect(userDelegate.findUnique).toHaveBeenCalledWith({
+      where: { email: createUserExample.email },
+    });
+  });
+
+  it('rejects an unknown email or a wrong password', async () => {
+    userDelegate.findUnique.mockResolvedValueOnce(null);
+
+    await expect(
+      service.authenticateUser(
+        createUserExample.email,
+        createUserExample.password,
+      ),
+    ).rejects.toBeInstanceOf(UnauthorizedException);
+
+    userDelegate.findUnique.mockResolvedValueOnce({
+      id: userIdExample,
+      email: createUserExample.email,
+      password: await hashPassword('OtherSecret123'),
+    });
+
+    await expect(
+      service.authenticateUser(
+        createUserExample.email,
+        createUserExample.password,
+      ),
+    ).rejects.toBeInstanceOf(UnauthorizedException);
   });
 
   it('loads one user by id without returning the password', async () => {

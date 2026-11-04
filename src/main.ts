@@ -22,11 +22,31 @@ async function bootstrap() {
       'The native ESM NestJS enterprise backend API documentation',
     )
     .setVersion('1.0')
+    .addBearerAuth()
+    .addTag('auth')
     .addTag('users')
     .build();
 
   const document = SwaggerModule.createDocument(app, config);
   SwaggerModule.setup('api', app, document); // Accessible at http://localhost:3000/api
+
+  const extraOrigins = (process.env.CLIENT_ORIGIN ?? '')
+    .split(',')
+    .map((origin) => origin.trim())
+    .filter(Boolean);
+  app.enableCors({
+    origin: (origin, callback) => {
+      if (
+        !origin ||
+        /^https?:\/\/(localhost|127\.0\.0\.1)(:\d+)?$/.test(origin) ||
+        extraOrigins.includes(origin)
+      ) {
+        callback(null, true);
+        return;
+      }
+      callback(new Error('Not allowed by CORS'));
+    },
+  });
 
   // Enable shutdown hooks to listen for SIGTERM, SIGINT, etc.
   app.enableShutdownHooks();
