@@ -1,0 +1,25 @@
+---
+description: Prisma ORM 7 services, local Postgres, and password hashing
+globs: src/**/*.service.ts,prisma/**/*.prisma,prisma7.config.ts
+alwaysApply: false
+---
+
+# Prisma services
+
+Services depend on `PrismaService` and the generated client. They do not import DTOs.
+
+```typescript
+async createUser(data: Prisma.UserCreateInput) {
+  return this.prisma.user.create({
+    data: { ...data, password: await hashPassword(data.password) },
+    omit: { password: true },
+  });
+}
+```
+
+- Hash a password only when it is a `string`. Leave Prisma update operations unchanged.
+- Pass `omit: { password: true }` on create, read, update, and delete.
+- `hashPassword` in `src/users/password.ts` stores `scrypt$<salt>$<hash>`.
+- `DATABASE_URL` and `SHADOW_DATABASE_URL` are `postgres://` URLs in `.env`, read by `prisma7.config.ts`.
+- Start local Postgres with `pnpm exec prisma dev -d` before migrate or the API. The `pg` adapter cannot use a `prisma+postgres://` URL.
+- `PrismaService` throws if `DATABASE_URL` is missing. Do not construct it in a unit test.

@@ -1,44 +1,52 @@
 import { Injectable } from '@nestjs/common';
-import { CreateUserDto } from './dto/create-user.dto.js';
-import { UpdateUserDto } from './dto/update-user.dto.js';
+import { Prisma, type User } from '../../generated/prisma/client.js';
 import { PrismaService } from '../prisma/prisma.service.js';
+import { hashPassword } from './password.js';
+
+const omitPassword = { password: true } as const;
 
 @Injectable()
 export class UsersService {
   constructor(private readonly prisma: PrismaService) {}
 
-  async createUser(createUserDto: CreateUserDto) {
+  async createUser(data: Prisma.UserCreateInput) {
     return this.prisma.user.create({
       data: {
-        firstName: createUserDto.firstName,
-        lastName: createUserDto.lastName,
-        email: createUserDto.email,
-        password: createUserDto.password, // Remember to hash this in production!
-        age: createUserDto.age,
+        ...data,
+        password: await hashPassword(data.password),
       },
+      omit: omitPassword,
     });
   }
 
-  async findAllUsers() {
-    return this.prisma.user.findMany();
+  findAllUsers() {
+    return this.prisma.user.findMany({ omit: omitPassword });
   }
 
-  async findUserById(id: string) {
+  findUserById(id: User['id']) {
     return this.prisma.user.findUnique({
       where: { id },
+      omit: omitPassword,
     });
   }
 
-  async updateUser(id: string, updateUserDto: UpdateUserDto) {
+  async updateUser(id: User['id'], data: Prisma.UserUpdateInput) {
+    const password =
+      typeof data.password === 'string'
+        ? await hashPassword(data.password)
+        : data.password;
+
     return this.prisma.user.update({
       where: { id },
-      data: updateUserDto,
+      data: { ...data, password },
+      omit: omitPassword,
     });
   }
 
-  async deleteUser(id: string) {
+  deleteUser(id: User['id']) {
     return this.prisma.user.delete({
       where: { id },
+      omit: omitPassword,
     });
   }
 }

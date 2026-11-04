@@ -1,0 +1,27 @@
+---
+description: Request and response DTOs with Swagger examples for CRUD routes
+globs: src/**/*.controller.ts,src/**/dto/**/*.ts
+alwaysApply: false
+---
+
+# DTOs and Swagger
+
+Request DTOs use `class-validator` and `@ApiProperty` / `@ApiPropertyOptional`. Shared sample values live in `dto/<resource>.examples.ts` and are the only examples Swagger shows.
+
+- Create: required fields, `@ApiBody({ type, examples })`
+- Update: optional fields, its own class (not `PartialType`), with a partial sample
+- Path id: a param class such as `UserIdParamDto`, used as `@Param() params`
+- Response: a response DTO on `@ApiResponse`, with `example` set. Omit secrets such as `password`
+
+```typescript
+@Put(':id')
+@ApiBody({
+  type: UpdateUserDto,
+  examples: { sample: { summary: 'Sample update', value: updateUserExample } },
+})
+async update(@Param() params: UserIdParamDto, @Body() dto: UpdateUserDto) {
+  return this.usersService.updateUser(params.id, { firstName: dto.firstName });
+}
+```
+
+The global `ValidationPipe` already uses `whitelist`, `forbidNonWhitelisted`, and `transform`. Do not add a route-level pipe for the same job.

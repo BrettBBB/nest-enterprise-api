@@ -1,0 +1,23 @@
+---
+description: Unit tests for controllers, services, and DTOs without a database
+globs: src/**/*.spec.ts
+alwaysApply: false
+---
+
+# Unit tests
+
+Vitest globals are on. Specs sit next to the file they test. Do not boot the app or connect to Postgres.
+
+- Service: mock `PrismaService` as `{ user: { create, findMany, findUnique, update, delete } }`. Assert the Prisma args, including a `scrypt$` password and `omit: { password: true }`.
+- Controller: mock the feature service. Assert it receives Prisma-shaped fields mapped from the DTO, including `password: undefined` when the update sample omits it.
+- DTOs: `plainToInstance` then `validate`. Cover the sample payload, trimming, and one rejection per constraint that matters.
+- `PrismaService`: only assert that a missing `DATABASE_URL` throws. Restore `process.env` afterward.
+
+```typescript
+const usersService = { createUser: vi.fn(), findAllUsers: vi.fn() };
+
+await Test.createTestingModule({
+  controllers: [UsersController],
+  providers: [{ provide: UsersService, useValue: usersService }],
+}).compile();
+```

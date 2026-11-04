@@ -1,0 +1,36 @@
+---
+description: Nest resource layout, ESM imports, and the controller-to-Prisma boundary
+alwaysApply: true
+---
+
+# Feature layout
+
+Add a resource under `src/<resource>/`:
+
+- `<resource>.module.ts` registers its controller and service and exports the service
+- `<resource>.controller.ts` takes DTOs and maps fields onto Prisma inputs
+- `<resource>.service.ts` takes `Prisma.*` inputs and returns the Prisma model
+- `dto/` holds request and response classes plus one `*.examples.ts`
+- colocate `<resource>.controller.spec.ts` and `<resource>.service.spec.ts`
+
+`PrismaModule` is global. Feature modules do not import it.
+
+```typescript
+// controller maps the DTO; it does not pass the class through
+return this.usersService.createUser({
+  firstName: createUserDto.firstName,
+  lastName: createUserDto.lastName,
+  email: createUserDto.email,
+  password: createUserDto.password,
+  age: createUserDto.age,
+});
+```
+
+```typescript
+// service
+import { Prisma, type User } from '../../generated/prisma/client.js';
+
+createUser(data: Prisma.UserCreateInput): Promise<User>
+```
+
+Relative imports include the `.js` extension. Keep `"module"` and `"moduleResolution"` as `nodenext`. Leave `rootDir` unset so `generated/prisma` can be imported from `src`. Do not put `url` or `directUrl` back on the `datasource` block.

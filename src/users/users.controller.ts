@@ -1,8 +1,23 @@
-import { Controller, Get, Post, Body, Param, Put, Delete } from '@nestjs/common';
-import { ApiTags, ApiOperation, ApiResponse } from '@nestjs/swagger';
-import { UsersService } from './users.service.js';
+import {
+  Body,
+  Controller,
+  Delete,
+  Get,
+  Param,
+  Post,
+  Put,
+} from '@nestjs/common';
+import { ApiBody, ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { CreateUserDto } from './dto/create-user.dto.js';
 import { UpdateUserDto } from './dto/update-user.dto.js';
+import { UserIdParamDto } from './dto/user-id-param.dto.js';
+import { UserResponseDto } from './dto/user-response.dto.js';
+import {
+  createUserExample,
+  updateUserExample,
+  userResponseExample,
+} from './dto/user.examples.js';
+import { UsersService } from './users.service.js';
 
 @ApiTags('users')
 @Controller('users')
@@ -11,21 +26,45 @@ export class UsersController {
 
   @Post()
   @ApiOperation({ summary: 'Create a new user account' })
+  @ApiBody({
+    type: CreateUserDto,
+    examples: {
+      sample: {
+        summary: 'Sample user',
+        description: 'A valid payload you can submit as-is.',
+        value: createUserExample,
+      },
+    },
+  })
   @ApiResponse({
     status: 201,
     description: 'The user has been successfully created.',
+    type: UserResponseDto,
+    example: userResponseExample,
   })
   @ApiResponse({
     status: 400,
     description: 'Invalid input or validation failed.',
   })
   async create(@Body() createUserDto: CreateUserDto) {
-    return this.usersService.createUser(createUserDto);
+    return this.usersService.createUser({
+      firstName: createUserDto.firstName,
+      lastName: createUserDto.lastName,
+      email: createUserDto.email,
+      password: createUserDto.password,
+      age: createUserDto.age,
+    });
   }
 
   @Get()
   @ApiOperation({ summary: 'Retrieve all users' })
-  @ApiResponse({ status: 200, description: 'Return all registered users.' })
+  @ApiResponse({
+    status: 200,
+    description: 'Return all registered users.',
+    type: UserResponseDto,
+    isArray: true,
+    example: [userResponseExample],
+  })
   async findAll() {
     return this.usersService.findAllUsers();
   }
@@ -35,25 +74,52 @@ export class UsersController {
   @ApiResponse({
     status: 200,
     description: 'Return the user with the specified ID.',
+    type: UserResponseDto,
+    example: userResponseExample,
   })
   @ApiResponse({ status: 404, description: 'User not found.' })
-  async findOne(@Param('id') id: string) {
-    return this.usersService.findUserById(id);
+  async findOne(@Param() params: UserIdParamDto) {
+    return this.usersService.findUserById(params.id);
   }
 
   @Put(':id')
   @ApiOperation({ summary: 'Update a user by ID' })
+  @ApiBody({
+    type: UpdateUserDto,
+    examples: {
+      sample: {
+        summary: 'Sample update',
+        description: 'Send any subset of user fields.',
+        value: updateUserExample,
+      },
+    },
+  })
   @ApiResponse({
     status: 200,
     description: 'The user has been successfully updated.',
+    type: UserResponseDto,
+    example: {
+      ...userResponseExample,
+      ...updateUserExample,
+      updatedAt: '2026-11-04T16:00:00.000Z',
+    },
   })
   @ApiResponse({
     status: 400,
     description: 'Invalid input or validation failed.',
   })
   @ApiResponse({ status: 404, description: 'User not found.' })
-  async update(@Param('id') id: string, @Body() updateUserDto: UpdateUserDto) {
-    return this.usersService.updateUser(id, updateUserDto);
+  async update(
+    @Param() params: UserIdParamDto,
+    @Body() updateUserDto: UpdateUserDto,
+  ) {
+    return this.usersService.updateUser(params.id, {
+      firstName: updateUserDto.firstName,
+      lastName: updateUserDto.lastName,
+      email: updateUserDto.email,
+      password: updateUserDto.password,
+      age: updateUserDto.age,
+    });
   }
 
   @Delete(':id')
@@ -61,9 +127,11 @@ export class UsersController {
   @ApiResponse({
     status: 200,
     description: 'The user has been successfully deleted.',
+    type: UserResponseDto,
+    example: userResponseExample,
   })
   @ApiResponse({ status: 404, description: 'User not found.' })
-  async delete(@Param('id') id: string) {
-    return this.usersService.deleteUser(id);
+  async delete(@Param() params: UserIdParamDto) {
+    return this.usersService.deleteUser(params.id);
   }
 }
