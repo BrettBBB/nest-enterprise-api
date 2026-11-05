@@ -7,6 +7,7 @@ import {
 import { Prisma, type User } from '../../generated/prisma/client.js';
 import { rethrowUnlessMissing } from '../common/functions.js';
 import { PrismaService } from '../prisma/prisma.service.js';
+import type { GridListArgs } from '../common/grid-query.js';
 import {
   hashPassword,
   matchesLegacyPassword,
@@ -29,8 +30,19 @@ export class UsersService {
     });
   }
 
-  findAllUsers() {
-    return this.prisma.user.findMany({ omit: omitPassword });
+  async findUsers(args: GridListArgs) {
+    const where = args.where as Prisma.UserWhereInput;
+    const [rows, rowCount] = await Promise.all([
+      this.prisma.user.findMany({
+        where,
+        ...(args.orderBy ? { orderBy: args.orderBy } : {}),
+        ...(args.skip != null ? { skip: args.skip } : {}),
+        ...(args.take != null ? { take: args.take } : {}),
+        omit: omitPassword,
+      }),
+      this.prisma.user.count({ where }),
+    ]);
+    return { rows, rowCount };
   }
 
   async authenticateUser(email: string, password: string) {

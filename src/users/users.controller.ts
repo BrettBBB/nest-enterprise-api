@@ -6,26 +6,32 @@ import {
   Param,
   Post,
   Put,
+  Query,
   UseGuards,
 } from '@nestjs/common';
 import {
   ApiBearerAuth,
   ApiBody,
   ApiOperation,
+  ApiQuery,
   ApiResponse,
   ApiTags,
   ApiUnauthorizedResponse,
 } from '@nestjs/swagger';
 import { JwtAuthGuard } from '../auth/jwt-auth.guard.js';
+import { parseGridQuery, toGridListArgs } from '../common/grid-query.js';
 import { CreateUserDto } from './dto/create-user.dto.js';
 import { UpdateUserDto } from './dto/update-user.dto.js';
+import { UserGridPageDto } from './dto/user-page.dto.js';
 import { UserIdParamDto } from './dto/user-id-param.dto.js';
 import { UserResponseDto } from './dto/user-response.dto.js';
 import {
   createUserExample,
   updateUserExample,
+  userPageExample,
   userResponseExample,
 } from './dto/user.examples.js';
+import { userGridFields, userQuickFilterFields } from './user-grid.js';
 import { UsersService } from './users.service.js';
 
 @ApiTags('users')
@@ -69,16 +75,37 @@ export class UsersController {
   }
 
   @Get()
-  @ApiOperation({ summary: 'Retrieve all users' })
+  @ApiOperation({
+    summary: 'List users',
+    description:
+      'Reads an optional MUI X GridGetRowsParams object from the grid query parameter. Pagination, sort, and filter can each be omitted.',
+  })
+  @ApiQuery({
+    name: 'grid',
+    required: false,
+    description:
+      'JSON GridGetRowsParams: paginationModel, sortModel, and filterModel are optional.',
+    example: {
+      paginationModel: { page: 0, pageSize: 10 },
+      sortModel: [{ field: 'createdAt', sort: 'desc' }],
+      filterModel: { items: [], quickFilterValues: ['ada'] },
+    },
+  })
   @ApiResponse({
     status: 200,
-    description: 'Return all registered users.',
-    type: UserResponseDto,
-    isArray: true,
-    example: [userResponseExample],
+    description: 'Matching users and the total row count, in the grid response shape.',
+    type: UserGridPageDto,
+    example: userPageExample,
   })
-  async findAll() {
-    return this.usersService.findAllUsers();
+  @ApiResponse({ status: 400, description: 'Invalid filter, sort, or page.' })
+  async findAll(@Query('grid') grid?: string) {
+    const query = await parseGridQuery(grid);
+    return this.usersService.findUsers(
+      toGridListArgs(query, {
+        fields: userGridFields,
+        quickFilterFields: userQuickFilterFields,
+      }),
+    );
   }
 
   @Get(':id')

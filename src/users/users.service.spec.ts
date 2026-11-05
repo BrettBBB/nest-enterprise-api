@@ -22,6 +22,7 @@ describe('UsersService', () => {
   const userDelegate = {
     create: vi.fn(),
     findMany: vi.fn(),
+    count: vi.fn(),
     findUnique: vi.fn(),
     findFirst: vi.fn(),
     update: vi.fn(),
@@ -58,14 +59,29 @@ describe('UsersService', () => {
     expect(args.data.password.startsWith('scrypt$')).toBe(true);
   });
 
-  it('lists users without returning passwords', async () => {
+  it('returns the grid page without passwords', async () => {
     const users = [{ id: userIdExample }];
+    const args = {
+      where: { email: { contains: 'ada', mode: 'insensitive' as const } },
+      orderBy: [{ createdAt: 'desc' as const }],
+      skip: 10,
+      take: 10,
+    };
     userDelegate.findMany.mockResolvedValue(users);
+    userDelegate.count.mockResolvedValue(4);
 
-    await expect(service.findAllUsers()).resolves.toBe(users);
+    await expect(service.findUsers(args)).resolves.toEqual({
+      rows: users,
+      rowCount: 4,
+    });
     expect(userDelegate.findMany).toHaveBeenCalledWith({
+      where: args.where,
+      orderBy: args.orderBy,
+      skip: args.skip,
+      take: args.take,
       omit: { password: true },
     });
+    expect(userDelegate.count).toHaveBeenCalledWith({ where: args.where });
   });
 
   it('returns the profile when the email and password match', async () => {

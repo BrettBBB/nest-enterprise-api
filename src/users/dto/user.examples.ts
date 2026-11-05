@@ -24,3 +24,8 @@ export const userResponseExample = {
   createdAt: '2026-11-04T15:00:00.000Z',
   updatedAt: '2026-11-04T15:00:00.000Z',
 };
+
+export const userPageExample = {
+  rows: [userResponseExample],
+  rowCount: 1,
+};
