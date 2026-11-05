@@ -10,6 +10,7 @@
   "explorer.fileNesting.patterns": {
     "*.ts": "${capture}.js, ${capture}.d.ts, ${capture}.spec.ts, ${capture}.test.ts",
     "*.js": "${capture}.js.map",
-    "*.tsx": "${capture}.ts"
+    "*.tsx": "${capture}.ts",
+    ".env": ".env.*, .env.example, .env.local, .env.prod, .env.development"
   }
 }

@@ -24,10 +24,18 @@ const prismaOnly = [
   'pool',
   'single_use_connections',
   'uselibpqcompat',
+  'channel_binding',
 ];
 
 for (const key of prismaOnly) {
   url.searchParams.delete(key);
+}
+
+// postgres.js treats any sslmode value as "use TLS". "disable" is still truthy,
+// so Studio tries TLS against local Prisma Postgres and the first introspect fails.
+const sslmode = url.searchParams.get('sslmode');
+if (!sslmode || sslmode === 'disable' || sslmode === 'allow' || sslmode === 'prefer') {
+  url.searchParams.delete('sslmode');
 }
 
 const child = spawn(
@@ -40,7 +48,14 @@ const child = spawn(
     '--url',
     url.href,
   ],
-  { stdio: 'inherit' },
+  {
+    stdio: 'inherit',
+    env: {
+      ...process.env,
+      DATABASE_URL: url.href,
+      DIRECT_URL: url.href,
+    },
+  },
 );
 
 child.on('exit', (code, signal) => {

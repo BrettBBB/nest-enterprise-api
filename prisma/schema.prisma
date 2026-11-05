@@ -4,11 +4,11 @@ generator client {
 }
 
 datasource db {
-  provider = "postgresql"
+  provider  = "postgresql"
 }
 
 model User {
-  id        String   @id @default(cuid()) // Consider TSID
+  id        String   @id @default(cuid())
   firstName String
   lastName  String
   email     String   @unique

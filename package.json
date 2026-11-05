@@ -9,6 +9,7 @@
   "scripts": {
     "prisma:generate": "prisma generate",
     "prisma:migrate": "prisma migrate dev",
+    "prisma:deploy": "dotenv run -f .env.production --override -- prisma migrate deploy",
     "prisma:studio": "node scripts/studio.mjs",
     "prebuild": "pnpm prisma:generate",
     "build": "nest build",

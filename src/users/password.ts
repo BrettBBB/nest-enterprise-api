@@ -29,8 +29,8 @@ export async function verifyPassword(
 }
 
 export function matchesLegacyPassword(password: string, stored: string) {
-  const leftBytes = Buffer.from(left);
-  const rightBytes = Buffer.from(right);
+  const leftBytes = Buffer.from(password);
+  const rightBytes = Buffer.from(stored);
   if (leftBytes.length !== rightBytes.length) {
     return false;
   }

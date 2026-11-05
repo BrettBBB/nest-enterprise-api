@@ -1,13 +1,17 @@
-import "dotenv/config";
-import { defineConfig, env } from "prisma/config";
+import 'dotenv/config';
+import { defineConfig, env } from 'prisma/config';
+
+const shadowDatabaseUrl = process.env.SHADOW_DATABASE_URL;
 
 export default defineConfig({
-  schema: "prisma/schema.prisma",
+  schema: 'prisma/schema.prisma',
   migrations: {
-    path: "prisma/migrations",
+    path: 'prisma/migrations',
   },
   datasource: {
-    url: env("DATABASE_URL"),
-    shadowDatabaseUrl: env("SHADOW_DATABASE_URL"),
+    // Migrations use the direct connection. Locally that is the same Postgres
+    // as DATABASE_URL. In production it is the Neon host without the pooler.
+    url: env('DIRECT_URL'),
+    ...(shadowDatabaseUrl ? { shadowDatabaseUrl } : {}),
   },
 });
