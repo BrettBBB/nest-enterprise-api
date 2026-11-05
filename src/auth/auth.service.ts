@@ -6,6 +6,7 @@ import { UsersService } from '../users/users.service.js';
 type AuthenticatedUser = {
   id: string;
   email: string;
+  isAdmin: boolean;
 };
 
 @Injectable()
@@ -29,6 +30,7 @@ export class AuthService {
     const accessToken = await this.jwtService.signAsync({
       sub: user.id,
       email: user.email,
+      isAdmin: user.isAdmin,
     });
     return { accessToken, user };
   }

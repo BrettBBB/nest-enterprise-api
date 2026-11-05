@@ -1,5 +1,6 @@
 import { Module } from '@nestjs/common';
 import { JwtModule } from '@nestjs/jwt';
+import { AdminGuard } from './admin.guard.js';
 import { JwtAuthGuard } from './jwt-auth.guard.js';
 
 function jwtSecret() {
@@ -17,7 +18,7 @@ function jwtSecret() {
       signOptions: { expiresIn: 60 * 60 },
     }),
   ],
-  providers: [JwtAuthGuard],
-  exports: [JwtAuthGuard, JwtModule],
+  providers: [JwtAuthGuard, AdminGuard],
+  exports: [JwtAuthGuard, AdminGuard, JwtModule],
 })
 export class JwtAuthModule {}

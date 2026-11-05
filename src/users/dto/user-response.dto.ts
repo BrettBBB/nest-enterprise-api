@@ -17,6 +17,9 @@ export class UserResponseDto {
   @ApiPropertyOptional({ example: userResponseExample.age })
   age?: number;
 
+  @ApiProperty({ example: userResponseExample.isAdmin })
+  isAdmin: boolean;
+
   @ApiProperty({ example: userResponseExample.createdAt, format: 'date-time' })
   createdAt: string;
 

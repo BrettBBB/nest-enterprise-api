@@ -41,12 +41,24 @@ describe('JwtAuthGuard', () => {
   });
 
   it('stores the token claims on the request', async () => {
-    const claims = { sub: 'user-id', email: 'ada@example.com' };
+    const claims = { sub: 'user-id', email: 'ada@example.com', isAdmin: false };
     jwtService.verifyAsync.mockResolvedValue(claims);
     const { context, request } = contextFor('Bearer signed-token');
 
     await expect(guard.canActivate(context)).resolves.toBe(true);
     expect(jwtService.verifyAsync).toHaveBeenCalledWith('signed-token');
     expect(request.user).toEqual(claims);
+  });
+
+  it('rejects a token that does not carry the admin flag', async () => {
+    jwtService.verifyAsync.mockResolvedValue({
+      sub: 'user-id',
+      email: 'ada@example.com',
+    });
+    const { context } = contextFor('Bearer signed-token');
+
+    await expect(guard.canActivate(context)).rejects.toBeInstanceOf(
+      UnauthorizedException,
+    );
   });
 });

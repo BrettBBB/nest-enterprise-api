@@ -14,11 +14,12 @@ import {
   ApiBody,
   ApiOperation,
   ApiQuery,
+  ApiForbiddenResponse,
   ApiResponse,
   ApiTags,
   ApiUnauthorizedResponse,
 } from '@nestjs/swagger';
-import { JwtAuthGuard } from '../auth/jwt-auth.guard.js';
+import { AdminGuard } from '../auth/admin.guard.js';
 import { parseGridQuery, toGridListArgs } from '../common/grid-query.js';
 import { CreateUserDto } from './dto/create-user.dto.js';
 import { UpdateUserDto } from './dto/update-user.dto.js';
@@ -37,7 +38,10 @@ import { UsersService } from './users.service.js';
 @ApiTags('users')
 @ApiBearerAuth()
 @ApiUnauthorizedResponse({ description: 'Missing or invalid access token.' })
-@UseGuards(JwtAuthGuard)
+@ApiForbiddenResponse({
+  description: 'The access token is not an administrator.',
+})
+@UseGuards(AdminGuard)
 @Controller('users')
 export class UsersController {
   constructor(private readonly usersService: UsersService) {}

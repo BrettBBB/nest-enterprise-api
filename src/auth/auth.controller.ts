@@ -89,7 +89,11 @@ export class AuthController {
     status: 200,
     description: 'The token was valid.',
     schema: {
-      example: { sub: loginResponseExample.user.id, email: loginResponseExample.user.email },
+      example: {
+        sub: loginResponseExample.user.id,
+        email: loginResponseExample.user.email,
+        isAdmin: loginResponseExample.user.isAdmin,
+      },
     },
   })
   @ApiResponse({ status: 401, description: 'Missing or invalid access token.' })

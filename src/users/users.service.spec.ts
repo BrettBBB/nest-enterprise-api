@@ -89,6 +89,7 @@ describe('UsersService', () => {
     userDelegate.findFirst.mockResolvedValue({
       id: userIdExample,
       email: createUserExample.email,
+      isAdmin: false,
       password: storedPassword,
     });
 
@@ -100,6 +101,7 @@ describe('UsersService', () => {
     ).resolves.toEqual({
       id: userIdExample,
       email: createUserExample.email,
+      isAdmin: false,
     });
     expect(userDelegate.findFirst).toHaveBeenCalledWith({
       where: {
@@ -113,6 +115,7 @@ describe('UsersService', () => {
     userDelegate.findFirst.mockResolvedValue({
       id: userIdExample,
       email: createUserExample.email,
+      isAdmin: false,
       password: createUserExample.password,
     });
 
@@ -124,6 +127,7 @@ describe('UsersService', () => {
     ).resolves.toEqual({
       id: userIdExample,
       email: createUserExample.email,
+      isAdmin: false,
     });
 
     const stored = userDelegate.update.mock.calls[0][0].data.password as string;

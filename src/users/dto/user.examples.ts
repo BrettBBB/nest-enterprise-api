@@ -21,6 +21,7 @@ export const userResponseExample = {
   lastName: createUserExample.lastName,
   email: createUserExample.email,
   age: createUserExample.age,
+  isAdmin: false,
   createdAt: '2026-11-04T15:00:00.000Z',
   updatedAt: '2026-11-04T15:00:00.000Z',
 };
