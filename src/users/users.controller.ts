@@ -162,6 +162,7 @@ export class UsersController {
       email: updateUserDto.email,
       password: updateUserDto.password,
       age: updateUserDto.age,
+      isAdmin: updateUserDto.isAdmin,
     });
   }
 

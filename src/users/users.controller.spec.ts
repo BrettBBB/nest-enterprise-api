@@ -91,6 +91,7 @@ describe('UsersController', () => {
       email: updateUserExample.email,
       password: undefined,
       age: updateUserExample.age,
+      isAdmin: updateUserExample.isAdmin,
     });
   });
 

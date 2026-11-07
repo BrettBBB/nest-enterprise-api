@@ -13,6 +13,7 @@ export const updateUserExample = {
   lastName: 'King',
   email: 'augusta@example.com',
   age: 37,
+  isAdmin: true,
 };
 
 export const userResponseExample = {

@@ -57,6 +57,15 @@ describe('UpdateUserDto', () => {
     expect(dto.age).toBe(37);
   });
 
+  it('accepts an admin flag and rejects a non-boolean', async () => {
+    const dto = plainToInstance(UpdateUserDto, { isAdmin: true });
+    expect(await validate(dto)).toEqual([]);
+    expect(dto.isAdmin).toBe(true);
+
+    const errors = await validationErrors(UpdateUserDto, { isAdmin: 'yes' });
+    expect(errors.map((error) => error.property)).toContain('isAdmin');
+  });
+
   it('rejects a short replacement password and a non-email address', async () => {
     const errors = await validationErrors(UpdateUserDto, {
       email: 'not-an-email',
