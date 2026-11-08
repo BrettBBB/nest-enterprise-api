@@ -7,7 +7,8 @@ import { JwtAuthGuard } from './jwt-auth.guard.js';
 
 describe('AuthController', () => {
   let controller: AuthController;
-  const authService = { login: vi.fn(), register: vi.fn() };
+  const authService = { login: vi.fn(), register: vi.fn(), refresh: vi.fn() };
+  const response = { cookie: vi.fn(), clearCookie: vi.fn() };
 
   beforeEach(async () => {
     vi.clearAllMocks();
@@ -22,25 +23,55 @@ describe('AuthController', () => {
     controller = module.get(AuthController);
   });
 
-  it('maps a login DTO onto the auth service', async () => {
-    authService.login.mockResolvedValue(loginResponseExample);
+  it('maps a login DTO onto the auth service and sets the refresh cookie', async () => {
+    authService.login.mockResolvedValue({
+      ...loginResponseExample,
+      refreshToken: 'refresh-token',
+    });
 
-    await expect(controller.login(loginExample)).resolves.toBe(
-      loginResponseExample,
-    );
+    await expect(controller.login(loginExample, response)).resolves.toEqual(loginResponseExample);
     expect(authService.login).toHaveBeenCalledWith(
       loginExample.email,
       loginExample.password,
     );
+    expect(response.cookie).toHaveBeenCalledWith(
+      'refresh_token',
+      'refresh-token',
+      expect.objectContaining({ httpOnly: true }),
+    );
   });
 
-  it('maps a registration DTO onto the user model', async () => {
-    authService.register.mockResolvedValue(loginResponseExample);
+  it('maps a registration DTO onto the user model and sets the refresh cookie', async () => {
+    authService.register.mockResolvedValue({
+      ...loginResponseExample,
+      refreshToken: 'refresh-token',
+    });
 
-    await expect(controller.register(createUserExample)).resolves.toBe(
+    await expect(controller.register(createUserExample, response)).resolves.toEqual(
       loginResponseExample,
     );
     expect(authService.register).toHaveBeenCalledWith(createUserExample);
+  });
+
+  it('reads the refresh cookie and returns a new access token', async () => {
+    authService.refresh.mockResolvedValue({
+      ...loginResponseExample,
+      refreshToken: 'next-refresh',
+    });
+
+    await expect(controller.refresh('refresh_token=current-token', response)).resolves.toEqual(
+      loginResponseExample,
+    );
+    expect(authService.refresh).toHaveBeenCalledWith('current-token');
+  });
+
+  it('clears the refresh cookie on logout', () => {
+    controller.logout(response);
+
+    expect(response.clearCookie).toHaveBeenCalledWith(
+      'refresh_token',
+      expect.objectContaining({ path: '/auth' }),
+    );
   });
 
   it('returns the claims extracted from the request', () => {
@@ -49,6 +80,7 @@ describe('AuthController', () => {
       email: userResponseExample.email,
       isAdmin: userResponseExample.isAdmin,
       role: 'user' as const,
+      type: 'access' as const,
     };
 
     expect(controller.me(claims)).toEqual(claims);

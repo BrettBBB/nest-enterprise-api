@@ -40,6 +40,8 @@ describe('AdminGuard', () => {
       sub: 'user-id',
       email: 'ada@example.com',
       isAdmin: false,
+      role: 'user',
+      type: 'access',
     });
     const { context } = contextFor('Bearer signed-token');
 
@@ -49,7 +51,13 @@ describe('AdminGuard', () => {
   });
 
   it('allows an administrator token', async () => {
-    const claims = { sub: 'user-id', email: 'ada@example.com', isAdmin: true };
+    const claims = {
+      sub: 'user-id',
+      email: 'ada@example.com',
+      isAdmin: true,
+      role: 'admin' as const,
+      type: 'access' as const,
+    };
     jwtService.verifyAsync.mockResolvedValue(claims);
     const { context, request } = contextFor('Bearer signed-token');
 

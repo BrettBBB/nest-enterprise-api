@@ -41,7 +41,13 @@ describe('JwtAuthGuard', () => {
   });
 
   it('stores the token claims on the request', async () => {
-    const claims = { sub: 'user-id', email: 'ada@example.com', isAdmin: false };
+    const claims = {
+      sub: 'user-id',
+      email: 'ada@example.com',
+      isAdmin: false,
+      role: 'user' as const,
+      type: 'access' as const,
+    };
     jwtService.verifyAsync.mockResolvedValue(claims);
     const { context, request } = contextFor('Bearer signed-token');
 
@@ -50,10 +56,21 @@ describe('JwtAuthGuard', () => {
     expect(request.user).toEqual(claims);
   });
 
+  it('rejects a refresh token presented as a bearer token', async () => {
+    jwtService.verifyAsync.mockResolvedValue({
+      sub: 'user-id',
+      type: 'refresh',
+    });
+    const { context } = contextFor('Bearer refresh-token');
+
+    await expect(guard.canActivate(context)).rejects.toBeInstanceOf(UnauthorizedException);
+  });
+
   it('rejects a token that does not carry the admin flag', async () => {
     jwtService.verifyAsync.mockResolvedValue({
       sub: 'user-id',
       email: 'ada@example.com',
+      type: 'access',
     });
     const { context } = contextFor('Bearer signed-token');
 

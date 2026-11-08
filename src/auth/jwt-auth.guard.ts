@@ -33,7 +33,7 @@ export class JwtAuthGuard implements CanActivate {
 
     try {
       request.user = await this.jwtService.verifyAsync<AccessTokenPayload>(token);
-      if (typeof request.user.isAdmin !== 'boolean') {
+      if (request.user.type !== 'access' || typeof request.user.isAdmin !== 'boolean') {
         throw new UnauthorizedException();
       }
       return true;

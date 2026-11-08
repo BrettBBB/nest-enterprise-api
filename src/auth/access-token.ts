@@ -5,4 +5,5 @@ export type AccessTokenPayload = {
   email: string;
   isAdmin: boolean;
   role: AccessRole;
+  type: 'access';
 };

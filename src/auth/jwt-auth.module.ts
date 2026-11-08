@@ -2,6 +2,7 @@ import { Module } from '@nestjs/common';
 import { JwtModule } from '@nestjs/jwt';
 import { AdminGuard } from './admin.guard.js';
 import { JwtAuthGuard } from './jwt-auth.guard.js';
+import { accessTokenTtlSeconds } from './session-tokens.js';
 
 function jwtSecret() {
   const secret = process.env.JWT_SECRET;
@@ -15,7 +16,7 @@ function jwtSecret() {
   imports: [
     JwtModule.register({
       secret: jwtSecret(),
-      signOptions: { expiresIn: 60 * 60 },
+      signOptions: { expiresIn: accessTokenTtlSeconds },
     }),
   ],
   providers: [JwtAuthGuard, AdminGuard],

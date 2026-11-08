@@ -6,6 +6,9 @@ export class LoginResponseDto {
   @ApiProperty({ example: accessTokenExample })
   accessToken: string;
 
+  @ApiProperty({ example: loginResponseExample.refreshExpiresAt })
+  refreshExpiresAt: string;
+
   @ApiProperty({ type: UserResponseDto, example: loginResponseExample.user })
   user: UserResponseDto;
 }
