@@ -41,6 +41,7 @@ describe('AuthService', () => {
       sub: userResponseExample.id,
       email: userResponseExample.email,
       isAdmin: false,
+      role: 'user',
     });
   });
 

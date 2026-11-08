@@ -97,6 +97,14 @@ if (!sslmode || sslmode === 'disable' || sslmode === 'allow' || sslmode === 'pre
 
 await ensureLocalDatabase(url);
 
+// Studio's driver opens a pool and pipelines queries. The local Prisma
+// Postgres proxy resets those connections, and Studio then reports that
+// schema metadata could not be loaded. One connection keeps the session up.
+const host = url.hostname;
+if (host === 'localhost' || host === '127.0.0.1' || host === '::1') {
+  url.searchParams.set('max', '1');
+}
+
 const child = spawn(
   process.execPath,
   [

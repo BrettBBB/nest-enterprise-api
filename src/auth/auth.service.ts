@@ -31,6 +31,7 @@ export class AuthService {
       sub: user.id,
       email: user.email,
       isAdmin: user.isAdmin,
+      role: user.isAdmin ? 'admin' : 'user',
     });
     return { accessToken, user };
   }
