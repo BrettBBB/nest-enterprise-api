@@ -4,8 +4,11 @@ import { AppController } from './app.controller.js';
 import { AppService } from './app.service.js';
 import { AuthModule } from './auth/auth.module.js';
 import { EmailModule } from './email/email.module.js';
+import { validateEnv } from './env.validation.js';
 import { PrismaModule } from './prisma/prisma.module.js';
 import { UsersModule } from './users/users.module.js';
+
+const env = validateEnv();
 
 export const { ObserveModule, ObserveInstrument } = createObserveModule();
 
@@ -15,8 +18,8 @@ export const { ObserveModule, ObserveInstrument } = createObserveModule();
     // telemetry, alarms, and more — out of the box. Sign up at https://observe.nestjs.com,
     // then run `npx @nestjs/observe link` to write your key pair into .env.
     ObserveModule.forRoot({
-      appKey: process.env.OBSERVE_APP_KEY ?? 'YOUR_APP_KEY',
-      appSecret: process.env.OBSERVE_APP_SECRET ?? 'YOUR_APP_SECRET',
+      appKey: env.OBSERVE_APP_KEY ?? 'YOUR_APP_KEY',
+      appSecret: env.OBSERVE_APP_SECRET ?? 'YOUR_APP_SECRET',
       serviceId: 'nest-enterprise-api',
     }),
     PrismaModule,

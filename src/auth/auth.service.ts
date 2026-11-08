@@ -87,14 +87,15 @@ export class AuthService {
       role: user.isAdmin ? 'admin' : 'user',
       type: 'access',
     });
+    const refreshTtl = refreshTokenTtlSeconds();
     const refreshToken = await this.jwtService.signAsync(
       { sub: user.id, type: 'refresh' },
-      { expiresIn: refreshTokenTtlSeconds },
+      { expiresIn: refreshTtl },
     );
     return {
       accessToken,
       refreshToken,
-      refreshExpiresAt: new Date(Date.now() + refreshTokenTtlSeconds * 1000).toISOString(),
+      refreshExpiresAt: new Date(Date.now() + refreshTtl * 1000).toISOString(),
       user,
     };
   }

@@ -1,6 +1,6 @@
-export const accessTokenTtlSeconds = 15 * 60;
+import { accessTokenTtlSeconds, refreshTokenTtlSeconds } from '../env.validation.js';
 
-export const refreshTokenTtlSeconds = 7 * 24 * 60 * 60;
+export { accessTokenTtlSeconds, refreshTokenTtlSeconds };
 
 export const refreshCookieName = 'refresh_token';
 
@@ -28,7 +28,7 @@ function refreshCookieSettings(): CookieOptions {
 }
 
 export function refreshCookieOptions(): CookieOptions {
-  return { ...refreshCookieSettings(), maxAge: refreshTokenTtlSeconds * 1000 };
+  return { ...refreshCookieSettings(), maxAge: refreshTokenTtlSeconds() * 1000 };
 }
 
 export function setRefreshCookie(response: CookieResponse, refreshToken: string) {

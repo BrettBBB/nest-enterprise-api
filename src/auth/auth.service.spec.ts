@@ -7,6 +7,14 @@ import { UsersService } from '../users/users.service.js';
 import { AuthService } from './auth.service.js';
 import { refreshTokenTtlSeconds } from './session-tokens.js';
 
+function restoreEnv(name: string, value: string | undefined) {
+  if (value === undefined) {
+    delete process.env[name];
+  } else {
+    process.env[name] = value;
+  }
+}
+
 describe('AuthService', () => {
   let service: AuthService;
   const usersService = {
@@ -15,9 +23,11 @@ describe('AuthService', () => {
     findUserById: vi.fn(),
   };
   const jwtService = { signAsync: vi.fn(), verifyAsync: vi.fn() };
+  const previousRefresh = process.env.REFRESH_TOKEN_TTL_SECONDS;
 
   beforeEach(async () => {
     vi.clearAllMocks();
+    process.env.REFRESH_TOKEN_TTL_SECONDS = '3600';
     const module: TestingModule = await Test.createTestingModule({
       providers: [
         AuthService,
@@ -27,6 +37,10 @@ describe('AuthService', () => {
     }).compile();
 
     service = module.get(AuthService);
+  });
+
+  afterEach(() => {
+    restoreEnv('REFRESH_TOKEN_TTL_SECONDS', previousRefresh);
   });
 
   it('issues an access token and a refresh token for matching credentials', async () => {
@@ -42,7 +56,7 @@ describe('AuthService', () => {
     expect(session.refreshToken).toBe('refresh-token');
     expect(session.user).toEqual(userResponseExample);
     expect(Date.parse(session.refreshExpiresAt)).toBeGreaterThanOrEqual(
-      before + refreshTokenTtlSeconds * 1000,
+      before + refreshTokenTtlSeconds() * 1000,
     );
     expect(usersService.authenticateUser).toHaveBeenCalledWith(
       loginExample.email,
@@ -58,7 +72,7 @@ describe('AuthService', () => {
     expect(jwtService.signAsync).toHaveBeenNthCalledWith(
       2,
       { sub: userResponseExample.id, type: 'refresh' },
-      { expiresIn: refreshTokenTtlSeconds },
+      { expiresIn: refreshTokenTtlSeconds() },
     );
   });
 

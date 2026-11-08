@@ -5,13 +5,23 @@ import { AuthService } from './auth.service.js';
 import { loginExample, loginResponseExample } from './dto/auth.examples.js';
 import { JwtAuthGuard } from './jwt-auth.guard.js';
 
+function restoreEnv(name: string, value: string | undefined) {
+  if (value === undefined) {
+    delete process.env[name];
+  } else {
+    process.env[name] = value;
+  }
+}
+
 describe('AuthController', () => {
   let controller: AuthController;
   const authService = { login: vi.fn(), register: vi.fn(), refresh: vi.fn() };
   const response = { cookie: vi.fn(), clearCookie: vi.fn() };
+  const previousRefresh = process.env.REFRESH_TOKEN_TTL_SECONDS;
 
   beforeEach(async () => {
     vi.clearAllMocks();
+    process.env.REFRESH_TOKEN_TTL_SECONDS = '3600';
     const module: TestingModule = await Test.createTestingModule({
       controllers: [AuthController],
       providers: [{ provide: AuthService, useValue: authService }],
@@ -21,6 +31,10 @@ describe('AuthController', () => {
       .compile();
 
     controller = module.get(AuthController);
+  });
+
+  afterEach(() => {
+    restoreEnv('REFRESH_TOKEN_TTL_SECONDS', previousRefresh);
   });
 
   it('maps a login DTO onto the auth service and sets the refresh cookie', async () => {

@@ -16,7 +16,7 @@ function jwtSecret() {
   imports: [
     JwtModule.register({
       secret: jwtSecret(),
-      signOptions: { expiresIn: accessTokenTtlSeconds },
+      signOptions: { expiresIn: accessTokenTtlSeconds() },
     }),
   ],
   providers: [JwtAuthGuard, AdminGuard],
