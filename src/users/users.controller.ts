@@ -33,6 +33,7 @@ import {
   userResponseExample,
 } from './dto/user.examples.js';
 import { userGridFields, userQuickFilterFields } from './user-grid.js';
+import { toUserCreateInput, toUserUpdateInput } from './user-input.js';
 import { UsersService } from './users.service.js';
 
 @ApiTags('users')
@@ -69,13 +70,7 @@ export class UsersController {
     description: 'Invalid input or validation failed.',
   })
   async create(@Body() createUserDto: CreateUserDto) {
-    return this.usersService.createUser({
-      firstName: createUserDto.firstName,
-      lastName: createUserDto.lastName,
-      email: createUserDto.email,
-      password: createUserDto.password,
-      age: createUserDto.age,
-    });
+    return this.usersService.createUser(toUserCreateInput(createUserDto));
   }
 
   @Get()
@@ -156,14 +151,7 @@ export class UsersController {
     @Param() params: UserIdParamDto,
     @Body() updateUserDto: UpdateUserDto,
   ) {
-    return this.usersService.updateUser(params.id, {
-      firstName: updateUserDto.firstName,
-      lastName: updateUserDto.lastName,
-      email: updateUserDto.email,
-      password: updateUserDto.password,
-      age: updateUserDto.age,
-      isAdmin: updateUserDto.isAdmin,
-    });
+    return this.usersService.updateUser(params.id, toUserUpdateInput(updateUserDto));
   }
 
   @Delete(':id')

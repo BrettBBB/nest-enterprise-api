@@ -8,6 +8,7 @@ import {
 } from '@nestjs/swagger';
 import { CreateUserDto } from '../users/dto/create-user.dto.js';
 import { createUserExample } from '../users/dto/user.examples.js';
+import { toUserCreateInput } from '../users/user-input.js';
 import type { AccessTokenPayload } from './access-token.js';
 import { AuthService } from './auth.service.js';
 import { CurrentUser } from './current-user.decorator.js';
@@ -44,13 +45,7 @@ export class AuthController {
     description: 'Invalid input or validation failed.',
   })
   register(@Body() createUserDto: CreateUserDto) {
-    return this.authService.register({
-      firstName: createUserDto.firstName,
-      lastName: createUserDto.lastName,
-      email: createUserDto.email,
-      password: createUserDto.password,
-      age: createUserDto.age,
-    });
+    return this.authService.register(toUserCreateInput(createUserDto));
   }
 
   @Post('login')
@@ -93,6 +88,7 @@ export class AuthController {
         sub: loginResponseExample.user.id,
         email: loginResponseExample.user.email,
         isAdmin: loginResponseExample.user.isAdmin,
+        role: 'user',
       },
     },
   })

@@ -48,6 +48,7 @@ describe('AuthController', () => {
       sub: userResponseExample.id,
       email: userResponseExample.email,
       isAdmin: userResponseExample.isAdmin,
+      role: 'user' as const,
     };
 
     expect(controller.me(claims)).toEqual(claims);
