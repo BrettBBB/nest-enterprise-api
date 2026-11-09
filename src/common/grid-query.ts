@@ -3,13 +3,15 @@ import { plainToInstance } from 'class-transformer';
 import { validate, type ValidationError } from 'class-validator';
 import { GridQueryDto } from './grid-query.dto.js';
 
-export const gridFieldTypes = ['string', 'number', 'date'] as const;
+export const gridFieldTypes = ['string', 'number', 'date', 'decimal', 'boolean', 'enum'] as const;
 export type GridFieldType = (typeof gridFieldTypes)[number];
 
 export type GridFields = Readonly<Record<string, GridFieldType>>;
 
 export type GridListOptions = {
   fields: GridFields;
+  /** Allowed values for each `enum` column. `is`, `not`, and `isAnyOf` match these exactly. */
+  enumValues?: Readonly<Record<string, readonly string[]>>;
   quickFilterFields?: readonly string[];
 };
 
@@ -61,7 +63,7 @@ export function toGridListArgs(
   options: GridListOptions,
 ): GridListArgs {
   const columnFilters = (query.filterModel?.items ?? []).flatMap((item) => {
-    const clause = filterClause(item.field, item.operator, item.value, options.fields);
+    const clause = filterClause(item.field, item.operator, item.value, options);
     return clause ? [clause] : [];
   });
   const logic = query.filterModel?.logicOperator === 'or' ? 'OR' : 'AND';
@@ -136,6 +138,9 @@ function quickFilterWhere(
   }
   for (const field of fields) {
     assertField(field, options.fields, 'filter');
+    if (options.fields[field] !== 'string') {
+      throw new BadRequestException(`Cannot search ${field}`);
+    }
   }
 
   const groups = terms.map((term) => ({
@@ -151,9 +156,9 @@ function filterClause(
   field: string,
   operator: string,
   value: unknown,
-  fields: GridFields,
+  options: GridListOptions,
 ): Record<string, unknown> | undefined {
-  const type = fields[field];
+  const type = options.fields[field];
   if (!type) {
     throw new BadRequestException(`Cannot filter by ${field}`);
   }
@@ -165,6 +170,12 @@ function filterClause(
   }
   if (!hasValue(value)) {
     return undefined;
+  }
+  if (type === 'enum') {
+    return enumClause(field, operator, value, options.enumValues?.[field]);
+  }
+  if (type === 'boolean') {
+    return booleanClause(field, operator, value);
   }
   if (operator === 'isAnyOf') {
     const list = (Array.isArray(value) ? value : [value]).map((item) => bind(type, item, field));
@@ -193,6 +204,66 @@ function filterClause(
   throw new BadRequestException(`Cannot use ${operator} on ${field}`);
 }
 
+const equalityOperators = new Set(['is', 'equals', '=']);
+const inequalityOperators = new Set(['not', 'doesNotEqual', '!=']);
+
+function enumClause(
+  field: string,
+  operator: string,
+  value: unknown,
+  allowed: readonly string[] | undefined,
+): Record<string, unknown> {
+  if (!allowed) {
+    throw new BadRequestException(`Cannot filter by ${field}`);
+  }
+  if (operator === 'isAnyOf') {
+    const list = (Array.isArray(value) ? value : [value]).map((item) =>
+      bindEnum(field, item, allowed),
+    );
+    return { [field]: { in: list } };
+  }
+  const bound = bindEnum(field, value, allowed);
+  if (equalityOperators.has(operator)) {
+    return { [field]: bound };
+  }
+  if (inequalityOperators.has(operator)) {
+    return { NOT: { [field]: bound } };
+  }
+  throw new BadRequestException(`Cannot use ${operator} on ${field}`);
+}
+
+function booleanClause(
+  field: string,
+  operator: string,
+  value: unknown,
+): Record<string, unknown> {
+  const bound = bindBoolean(field, value);
+  if (equalityOperators.has(operator)) {
+    return { [field]: bound };
+  }
+  if (inequalityOperators.has(operator)) {
+    return { NOT: { [field]: bound } };
+  }
+  throw new BadRequestException(`Cannot use ${operator} on ${field}`);
+}
+
+function bindEnum(field: string, value: unknown, allowed: readonly string[]): string {
+  if (typeof value !== 'string' || !allowed.includes(value)) {
+    throw new BadRequestException(`${field} filter needs one of ${allowed.join(', ')}`);
+  }
+  return value;
+}
+
+function bindBoolean(field: string, value: unknown): boolean {
+  if (value === true || value === 'true') {
+    return true;
+  }
+  if (value === false || value === 'false') {
+    return false;
+  }
+  throw new BadRequestException(`${field} filter needs true or false`);
+}
+
 function emptyClause(field: string, type: GridFieldType): Record<string, unknown> {
   if (type === 'string') {
     return { OR: [{ [field]: null }, { [field]: '' }] };
@@ -208,10 +279,12 @@ function hasValue(value: unknown): boolean {
 }
 
 function bind(type: GridFieldType, value: unknown, field: string): string | number | Date {
-  if (type === 'number') {
+  if (type === 'number' || type === 'decimal') {
     const number = typeof value === 'number' ? value : Number(value);
-    if (!Number.isInteger(number)) {
-      throw new BadRequestException(`${field} filter needs a whole number`);
+    if (!Number.isFinite(number) || (type === 'number' && !Number.isInteger(number))) {
+      throw new BadRequestException(
+        type === 'number' ? `${field} filter needs a whole number` : `${field} filter needs a number`,
+      );
     }
     return number;
   }

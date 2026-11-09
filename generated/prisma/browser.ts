@@ -22,3 +22,34 @@ export * from './enums.js';
  * 
  */
 export type User = Prisma.UserModel
+/**
+ * Model RuleDefinition
+ * A cost-management rule. A claim triggers it when the billed amount is at
+ * least minFeeCents and any set code type, code, or category also matches.
+ */
+export type RuleDefinition = Prisma.RuleDefinitionModel
+/**
+ * Model Claim
+ * 
+ */
+export type Claim = Prisma.ClaimModel
+/**
+ * Model ProcedureCode
+ * 
+ */
+export type ProcedureCode = Prisma.ProcedureCodeModel
+/**
+ * Model DiagnosisCode
+ * 
+ */
+export type DiagnosisCode = Prisma.DiagnosisCodeModel
+/**
+ * Model ProcedureRule
+ * Flags a claim whose procedure has a high standard cost.
+ */
+export type ProcedureRule = Prisma.ProcedureRuleModel
+/**
+ * Model DiagnosisRule
+ * Flags a claim whose diagnosis points at a future high-cost condition.
+ */
+export type DiagnosisRule = Prisma.DiagnosisRuleModel

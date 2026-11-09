@@ -92,6 +92,54 @@ describe('toGridListArgs', () => {
     });
   });
 
+  it('matches enum and boolean columns without a text search', async () => {
+    const query = await parseGridQuery({
+      filterModel: {
+        items: [
+          { field: 'codeType', operator: 'is', value: 'CPT' },
+          { field: 'outcome', operator: 'isAnyOf', value: ['TRIGGERED', 'PASSED'] },
+          { field: 'enabled', operator: 'is', value: true },
+        ],
+      },
+      sortModel: [{ field: 'codeType', sort: 'asc' }],
+    });
+
+    expect(
+      toGridListArgs(query, {
+        fields: { codeType: 'enum', outcome: 'enum', enabled: 'boolean' },
+        enumValues: {
+          codeType: ['CPT', 'ICD10', 'HCPCS'],
+          outcome: ['TRIGGERED', 'PASSED'],
+        },
+      }).where,
+    ).toEqual({
+      AND: [{ codeType: 'CPT' }, { outcome: { in: ['TRIGGERED', 'PASSED'] } }, { enabled: true }],
+    });
+  });
+
+  it('rejects a text operator on an enum column', async () => {
+    const query = await parseGridQuery({
+      filterModel: { items: [{ field: 'codeType', operator: 'contains', value: 'CP' }] },
+    });
+
+    expect(() =>
+      toGridListArgs(query, {
+        fields: { codeType: 'enum' },
+        enumValues: { codeType: ['CPT'] },
+      }),
+    ).toThrow(BadRequestException);
+  });
+
+  it('sends a fractional decimal filter to the database', async () => {
+    const query = await parseGridQuery({
+      filterModel: { items: [{ field: 'standardCost', operator: '>=', value: 5000.5 }] },
+    });
+
+    expect(toGridListArgs(query, { fields: { standardCost: 'decimal' } }).where).toEqual({
+      standardCost: { gte: 5000.5 },
+    });
+  });
+
   it('rejects a field the table did not list', async () => {
     const query = await parseGridQuery({
       sortModel: [{ field: 'password', sort: 'asc' }],

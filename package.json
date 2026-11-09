@@ -11,6 +11,7 @@
     "prisma:migrate": "prisma migrate dev",
     "prisma:deploy": "dotenv run -f .env.production --override -- prisma migrate deploy",
     "prisma:studio": "node scripts/studio.mjs",
+    "prisma:seed": "pnpm exec tsc --pretty false && node dist/src/seed.js",
     "prebuild": "pnpm prisma:generate",
     "build": "nest build",
     "deploy": "nest deploy",

@@ -9,4 +9,10 @@
  * 🟢 You can import this file directly.
  */
 export type * from './models/User.js'
+export type * from './models/RuleDefinition.js'
+export type * from './models/Claim.js'
+export type * from './models/ProcedureCode.js'
+export type * from './models/DiagnosisCode.js'
+export type * from './models/ProcedureRule.js'
+export type * from './models/DiagnosisRule.js'
 export type * from './commonInputTypes.js'

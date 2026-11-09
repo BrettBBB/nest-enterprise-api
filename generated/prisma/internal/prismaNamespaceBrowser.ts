@@ -51,7 +51,13 @@ export const AnyNull = runtime.AnyNull
 
 
 export const ModelName = {
-  User: 'User'
+  User: 'User',
+  RuleDefinition: 'RuleDefinition',
+  Claim: 'Claim',
+  ProcedureCode: 'ProcedureCode',
+  DiagnosisCode: 'DiagnosisCode',
+  ProcedureRule: 'ProcedureRule',
+  DiagnosisRule: 'DiagnosisRule'
 } as const
 
 export type ModelName = (typeof ModelName)[keyof typeof ModelName]
@@ -83,6 +89,111 @@ export const UserScalarFieldEnum = {
 } as const
 
 export type UserScalarFieldEnum = (typeof UserScalarFieldEnum)[keyof typeof UserScalarFieldEnum]
+
+
+export const RuleDefinitionScalarFieldEnum = {
+  id: 'id',
+  name: 'name',
+  description: 'description',
+  codeType: 'codeType',
+  code: 'code',
+  category: 'category',
+  minFeeCents: 'minFeeCents',
+  enabled: 'enabled',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type RuleDefinitionScalarFieldEnum = (typeof RuleDefinitionScalarFieldEnum)[keyof typeof RuleDefinitionScalarFieldEnum]
+
+
+export const ClaimScalarFieldEnum = {
+  id: 'id',
+  claimNumber: 'claimNumber',
+  codeType: 'codeType',
+  code: 'code',
+  category: 'category',
+  description: 'description',
+  serviceDate: 'serviceDate',
+  billedCents: 'billedCents',
+  outcome: 'outcome',
+  procedureFlag: 'procedureFlag',
+  diagnosisFlag: 'diagnosisFlag',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type ClaimScalarFieldEnum = (typeof ClaimScalarFieldEnum)[keyof typeof ClaimScalarFieldEnum]
+
+
+export const ProcedureCodeScalarFieldEnum = {
+  code: 'code',
+  codeType: 'codeType',
+  category: 'category',
+  shortDescription: 'shortDescription',
+  longDescription: 'longDescription',
+  workRvu: 'workRvu',
+  peRvu: 'peRvu',
+  mpRvu: 'mpRvu',
+  totalRvu: 'totalRvu',
+  standardCost: 'standardCost',
+  effectiveDate: 'effectiveDate',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type ProcedureCodeScalarFieldEnum = (typeof ProcedureCodeScalarFieldEnum)[keyof typeof ProcedureCodeScalarFieldEnum]
+
+
+export const DiagnosisCodeScalarFieldEnum = {
+  code: 'code',
+  codeType: 'codeType',
+  category: 'category',
+  shortDescription: 'shortDescription',
+  longDescription: 'longDescription',
+  isBillable: 'isBillable',
+  requires7thCharacter: 'requires7thCharacter',
+  laterality: 'laterality',
+  episodeOfCare: 'episodeOfCare',
+  isHccEligible: 'isHccEligible',
+  effectiveDate: 'effectiveDate',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type DiagnosisCodeScalarFieldEnum = (typeof DiagnosisCodeScalarFieldEnum)[keyof typeof DiagnosisCodeScalarFieldEnum]
+
+
+export const ProcedureRuleScalarFieldEnum = {
+  id: 'id',
+  name: 'name',
+  description: 'description',
+  codeType: 'codeType',
+  code: 'code',
+  category: 'category',
+  minStandardCost: 'minStandardCost',
+  enabled: 'enabled',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type ProcedureRuleScalarFieldEnum = (typeof ProcedureRuleScalarFieldEnum)[keyof typeof ProcedureRuleScalarFieldEnum]
+
+
+export const DiagnosisRuleScalarFieldEnum = {
+  id: 'id',
+  name: 'name',
+  description: 'description',
+  code: 'code',
+  category: 'category',
+  laterality: 'laterality',
+  requireHccEligible: 'requireHccEligible',
+  enabled: 'enabled',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type DiagnosisRuleScalarFieldEnum = (typeof DiagnosisRuleScalarFieldEnum)[keyof typeof DiagnosisRuleScalarFieldEnum]
 
 
 export const SortOrder = {

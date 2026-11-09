@@ -1,0 +1,32 @@
+---
+description: Pagination, filters, and sorts run in Postgres through the shared grid query
+alwaysApply: true
+---
+
+# Grid query
+
+List endpoints take one `grid` query parameter: the MUI X `GridGetRowsParams` JSON (`paginationModel`, `sortModel`, `filterModel`). Parse it with `parseGridQuery` and `toGridListArgs` from `src/common/grid-query.ts`, then pass `where`, `orderBy`, `skip`, and `take` to Prisma. Do not page, sort, or filter the rows in the service after the query.
+
+Each table declares its columns in `<resource>-grid.ts`:
+
+- `string` columns use case-insensitive contains, startsWith, endsWith, and equals
+- `number` columns use the comparison operators and require a whole number
+- `decimal` columns use the same comparisons and accept fractional values
+- `date` columns use the comparison operators
+- `enum` columns use is, not, and isAnyOf against the listed values, with no `contains`
+- `boolean` columns use is
+- quick filter is only for `string` columns
+
+The client sends that same object from `dataSource.getRows`. It does not filter the loaded page again.
+
+```typescript
+async findAll(@Query('grid') grid?: string) {
+  const query = await parseGridQuery(grid);
+  return this.usersService.findUsers(
+    toGridListArgs(query, {
+      fields: userGridFields,
+      quickFilterFields: userQuickFilterFields,
+    }),
+  );
+}
+```

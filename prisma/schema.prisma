@@ -18,3 +18,127 @@ model User {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 }
+
+enum MedicalCodeType {
+  CPT
+  ICD10
+  HCPCS
+}
+
+enum ClaimOutcome {
+  TRIGGERED
+  PASSED
+}
+
+/// A cost-management rule. A claim triggers it when the billed amount is at
+/// least minFeeCents and any set code type, code, or category also matches.
+model RuleDefinition {
+  id          String           @id @default(cuid())
+  name        String           @unique
+  description String
+  codeType    MedicalCodeType?
+  code        String?
+  category    String?
+  minFeeCents Int
+  enabled     Boolean          @default(true)
+  createdAt   DateTime         @default(now())
+  updatedAt   DateTime         @updatedAt
+
+  @@index([enabled])
+  @@map("claim_rules")
+}
+
+model Claim {
+  id            String          @id @default(cuid())
+  claimNumber   String          @unique
+  codeType      MedicalCodeType
+  code          String
+  category      String
+  description   String
+  serviceDate   DateTime        @db.Date
+  billedCents   Int
+  outcome        ClaimOutcome
+  procedureFlag  ClaimOutcome    @default(PASSED)
+  diagnosisFlag  ClaimOutcome    @default(PASSED)
+  createdAt      DateTime        @default(now())
+  updatedAt      DateTime        @updatedAt
+
+  @@index([outcome])
+  @@index([procedureFlag])
+  @@index([diagnosisFlag])
+  @@index([billedCents])
+  @@index([codeType])
+  @@map("claims")
+}
+
+model ProcedureCode {
+  code             String    @id @db.VarChar(10)
+  codeType         String    @db.VarChar(10)
+  category         String?   @db.VarChar(100)
+  shortDescription String    @db.Text
+  longDescription  String    @db.Text
+  workRvu          Decimal?  @db.Decimal(6, 2)
+  peRvu            Decimal?  @db.Decimal(6, 2)
+  mpRvu            Decimal?  @db.Decimal(6, 2)
+  totalRvu         Decimal?  @db.Decimal(6, 2)
+  standardCost     Decimal?  @db.Decimal(10, 2)
+  effectiveDate    DateTime  @db.Date
+  createdAt        DateTime  @default(now())
+  updatedAt        DateTime  @updatedAt
+
+  @@index([codeType])
+  @@map("procedure_codes")
+}
+
+model DiagnosisCode {
+  code                 String    @id @db.VarChar(10)
+  codeType             String    @db.VarChar(10)
+  category             String?   @db.VarChar(100)
+  shortDescription     String    @db.Text
+  longDescription      String    @db.Text
+  isBillable           Boolean   @default(true)
+  requires7thCharacter Boolean   @default(false)
+  laterality           String?   @db.VarChar(20)
+  episodeOfCare        Boolean   @default(false)
+  isHccEligible        Boolean   @default(false)
+  effectiveDate        DateTime  @db.Date
+  createdAt            DateTime  @default(now())
+  updatedAt            DateTime  @updatedAt
+
+  @@index([isHccEligible])
+  @@map("diagnosis_codes")
+}
+
+/// Flags a claim whose procedure has a high standard cost.
+model ProcedureRule {
+  id              String   @id @default(cuid())
+  name            String   @unique
+  description     String
+  codeType        String?  @db.VarChar(10)
+  code            String?  @db.VarChar(10)
+  category        String?  @db.VarChar(100)
+  minStandardCost Decimal  @db.Decimal(10, 2)
+  enabled         Boolean  @default(true)
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  @@index([enabled])
+  @@map("procedure_rules")
+}
+
+/// Flags a claim whose diagnosis points at a future high-cost condition.
+model DiagnosisRule {
+  id                 String   @id @default(cuid())
+  name               String   @unique
+  description        String
+  code               String?  @db.VarChar(10)
+  category           String?  @db.VarChar(100)
+  laterality         String?  @db.VarChar(20)
+  requireHccEligible Boolean  @default(false)
+  enabled            Boolean  @default(true)
+  createdAt          DateTime @default(now())
+  updatedAt          DateTime @updatedAt
+
+  @@index([enabled])
+  @@map("diagnosis_rules")
+}

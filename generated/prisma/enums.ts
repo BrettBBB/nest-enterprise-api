@@ -9,7 +9,18 @@
 * 🟢 You can import this file directly.
 */
 
+export const MedicalCodeType = {
+  CPT: 'CPT',
+  ICD10: 'ICD10',
+  HCPCS: 'HCPCS'
+} as const
+
+export type MedicalCodeType = (typeof MedicalCodeType)[keyof typeof MedicalCodeType]
 
 
-// This file is empty because there are no enums in the schema.
-export {}
+export const ClaimOutcome = {
+  TRIGGERED: 'TRIGGERED',
+  PASSED: 'PASSED'
+} as const
+
+export type ClaimOutcome = (typeof ClaimOutcome)[keyof typeof ClaimOutcome]

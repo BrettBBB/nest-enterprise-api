@@ -7,6 +7,7 @@ export default defineConfig({
   schema: 'prisma/schema.prisma',
   migrations: {
     path: 'prisma/migrations',
+    seed: 'pnpm prisma:seed',
   },
   datasource: {
     // Migrations use the direct connection. Locally that is the same Postgres

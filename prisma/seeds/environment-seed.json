@@ -1,0 +1,138 @@
+{
+  "users": [
+    {
+      "id": "cmw40h5ff0000f4ha5sb2jdcy",
+      "firstName": "Brett",
+      "lastName": "Brinkhoff",
+      "email": "brett.brinkhoff@outlook.com",
+      "password": "scrypt$f1d756b1d10fc3be967c0293a71726c8$7b615ec8c57959a5e990d2f5f3951718c8cbfb675475e66f5946a14826169b33b0c9b8fee502e4601f61d41de7e8bd8155692e9ddb56bf02387b63efd8adb677",
+      "age": 42,
+      "isAdmin": true
+    },
+    {
+      "id": "cmw43lwdh0000qcha9ililor4",
+      "firstName": "Poppa",
+      "lastName": "Smurf",
+      "email": "poppa@smurf.com",
+      "password": "scrypt$016ff97b81b967ba4ffc21f6809de210$dce524d3b6fea48d980bd2b965e1b3852aa143b20a2784a9667e8cf7cbdcf48a7cd564de9541512f78add060b1e3f8cee1e431099665863b092cc7563f92d6cf",
+      "age": 120,
+      "isAdmin": false
+    }
+  ],
+  "claimRules": [
+    {
+      "id": "cmw9hbdq6007n7chasg073osi",
+      "name": "Bypass graft review",
+      "description": "CPT 33533 billed at $20,000 or more.",
+      "codeType": "CPT",
+      "code": "33533",
+      "category": null,
+      "minFeeCents": 2000000,
+      "enabled": true
+    },
+    {
+      "id": "cmw9hbdpv007m7chalqrwzjk1",
+      "name": "Drug spend",
+      "description": "A drug or injection claim billed at $1,000 or more.",
+      "codeType": "HCPCS",
+      "code": null,
+      "category": "Drugs and Injections",
+      "minFeeCents": 100000,
+      "enabled": true
+    },
+    {
+      "id": "cmw9hbdop007j7chad4rhhm3g",
+      "name": "High dollar claim",
+      "description": "Any claim billed at $5,000 or more.",
+      "codeType": null,
+      "code": null,
+      "category": null,
+      "minFeeCents": 500000,
+      "enabled": true
+    },
+    {
+      "id": "cmw9hbdpi007l7cha1dxrv2zd",
+      "name": "Radiology outlier",
+      "description": "A radiology claim billed at $1,500 or more.",
+      "codeType": "CPT",
+      "code": null,
+      "category": "Radiology",
+      "minFeeCents": 150000,
+      "enabled": true
+    },
+    {
+      "id": "cmw9hbdp4007k7chaaplbap6n",
+      "name": "Surgery outlier",
+      "description": "A surgery claim billed at $2,500 or more.",
+      "codeType": "CPT",
+      "code": null,
+      "category": "Surgery",
+      "minFeeCents": 250000,
+      "enabled": true
+    }
+  ],
+  "procedureRules": [
+    {
+      "id": "cmw9jzo7j007qpkhace7rttjw",
+      "name": "High cost drug",
+      "description": "Flag a drug or injection whose standard cost is $1,000 or more.",
+      "codeType": "HCPCS",
+      "code": null,
+      "category": "Drugs and Injections",
+      "minStandardCost": "1000.00",
+      "enabled": true
+    },
+    {
+      "id": "cmw9jzo6x007opkhayydew2sk",
+      "name": "High cost procedure",
+      "description": "Flag a procedure whose standard cost is $5,000 or more.",
+      "codeType": null,
+      "code": null,
+      "category": null,
+      "minStandardCost": "5000.00",
+      "enabled": true
+    },
+    {
+      "id": "cmw9jzo79007ppkhaswiagkol",
+      "name": "High cost surgery",
+      "description": "Flag a surgery whose standard cost is $2,500 or more.",
+      "codeType": "CPT",
+      "code": null,
+      "category": "Surgery",
+      "minStandardCost": "2500.00",
+      "enabled": true
+    }
+  ],
+  "diagnosisRules": [
+    {
+      "id": "cmw9jzo8e007tpkhahzt64gb1",
+      "name": "Endocrine risk",
+      "description": "Flag an endocrine diagnosis, including diabetes, for future cost.",
+      "code": null,
+      "category": "Endocrine",
+      "laterality": null,
+      "requireHccEligible": false,
+      "enabled": true
+    },
+    {
+      "id": "cmw9jzo7t007rpkhaxqlukarb",
+      "name": "Future HCC cost",
+      "description": "Flag an HCC-eligible diagnosis. These conditions raise expected future cost.",
+      "code": null,
+      "category": null,
+      "laterality": null,
+      "requireHccEligible": true,
+      "enabled": true
+    },
+    {
+      "id": "cmw9jzo84007spkhapvy4hhpl",
+      "name": "Neoplasm watch",
+      "description": "Flag a neoplasm or injury diagnosis for future high-cost care.",
+      "code": null,
+      "category": "Neoplasms and Injury",
+      "laterality": null,
+      "requireHccEligible": false,
+      "enabled": true
+    }
+  ]
+}

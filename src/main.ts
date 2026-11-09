@@ -27,6 +27,12 @@ async function bootstrap() {
     .addBearerAuth()
     .addTag('auth')
     .addTag('users')
+    .addTag('procedure-codes')
+    .addTag('diagnosis-codes')
+    .addTag('rule-definitions')
+    .addTag('procedure-rules')
+    .addTag('diagnosis-rules')
+    .addTag('claims')
     .addTag('email')
     .build();
 
