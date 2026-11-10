@@ -28,11 +28,11 @@ async function bootstrap() {
     .addTag('auth')
     .addTag('users')
     .addTag('procedure-codes')
-    .addTag('diagnosis-codes')
-    .addTag('claim-rules')
     .addTag('procedure-rules')
+    .addTag('diagnosis-codes')
     .addTag('diagnosis-rules')
     .addTag('claims')
+    .addTag('claim-rules')
     .addTag('email')
     .build();
 

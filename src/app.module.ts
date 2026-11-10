@@ -5,12 +5,12 @@ import { AppService } from './app.service.js';
 import { AuthModule } from './auth/auth.module.js';
 import { EmailModule } from './email/email.module.js';
 import { validateEnv } from './env.validation.js';
+import { ClaimRulesModule } from './claim-rules/claim-rules.module.js';
 import { ClaimsModule } from './claims/claims.module.js';
 import { DiagnosisCodesModule } from './diagnosis-codes/diagnosis-codes.module.js';
 import { DiagnosisRulesModule } from './diagnosis-rules/diagnosis-rules.module.js';
 import { ProcedureCodesModule } from './procedure-codes/procedure-codes.module.js';
 import { ProcedureRulesModule } from './procedure-rules/procedure-rules.module.js';
-import { ClaimRulesModule } from './claim-rules/claim-rules.module.js';
 import { PrismaModule } from './prisma/prisma.module.js';
 import { UsersModule } from './users/users.module.js';
 
@@ -31,11 +31,11 @@ export const { ObserveModule, ObserveInstrument } = createObserveModule();
     PrismaModule,
     UsersModule,
     ProcedureCodesModule,
-    DiagnosisCodesModule,
-    ClaimRulesModule,
     ProcedureRulesModule,
+    DiagnosisCodesModule,
     DiagnosisRulesModule,
     ClaimsModule,
+    ClaimRulesModule,
     AuthModule,
     EmailModule,
   ],
