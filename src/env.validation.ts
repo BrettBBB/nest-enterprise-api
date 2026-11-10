@@ -25,6 +25,7 @@ export const envSchema = z.object({
   OBSERVE_APP_SECRET: optionalText,
   RESEND_API_KEY: optionalText,
   RESEND_FROM: optionalText,
+  GEMINI_API_KEY: optionalText,
 });
 
 export type Env = z.infer<typeof envSchema>;

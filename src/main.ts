@@ -34,6 +34,7 @@ async function bootstrap() {
     .addTag('claims')
     .addTag('claim-rules')
     .addTag('email')
+    .addTag('assistant')
     .build();
 
   const document = SwaggerModule.createDocument(app, config);
