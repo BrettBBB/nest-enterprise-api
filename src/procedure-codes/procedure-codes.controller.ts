@@ -9,7 +9,6 @@ import {
   ApiUnauthorizedResponse,
 } from '@nestjs/swagger';
 import { AdminGuard } from '../auth/admin.guard.js';
-import { JwtAuthGuard } from '../auth/jwt-auth.guard.js';
 import { CodeImportService } from '../code-import/code-import.service.js';
 import { CodeImportResultDto } from '../code-import/dto/code-import-result.dto.js';
 import { codeImportResultExample } from '../code-import/dto/code-import.examples.js';
@@ -31,9 +30,6 @@ import {
 import { ProcedureCodesService } from './procedure-codes.service.js';
 
 @ApiTags('procedure-codes')
-@ApiBearerAuth()
-@ApiUnauthorizedResponse({ description: 'Missing or invalid access token.' })
-@UseGuards(JwtAuthGuard)
 @Controller('procedure-codes')
 export class ProcedureCodesController {
   constructor(
@@ -62,6 +58,8 @@ export class ProcedureCodesController {
 
   @Post('import')
   @UseGuards(AdminGuard)
+  @ApiBearerAuth()
+  @ApiUnauthorizedResponse({ description: 'Missing or invalid access token.' })
   @ApiForbiddenResponse({ description: 'The access token is not an administrator.' })
   @ApiOperation({
     summary: 'Import procedure codes',

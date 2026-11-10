@@ -20,7 +20,6 @@ import {
   ApiUnauthorizedResponse,
 } from '@nestjs/swagger';
 import { AdminGuard } from '../auth/admin.guard.js';
-import { JwtAuthGuard } from '../auth/jwt-auth.guard.js';
 import { parseGridQuery, toGridListArgs } from '../common/grid-query.js';
 import { claimEnumValues, claimGridFields, claimQuickFilterFields } from './claim-grid.js';
 import { toClaimCreateInput, toClaimUpdateInput } from './claim-input.js';
@@ -38,15 +37,14 @@ import {
 import { UpdateClaimDto } from './dto/update-claim.dto.js';
 
 @ApiTags('claims')
-@ApiBearerAuth()
-@ApiUnauthorizedResponse({ description: 'Missing or invalid access token.' })
-@UseGuards(JwtAuthGuard)
 @Controller('claims')
 export class ClaimsController {
   constructor(private readonly claimsService: ClaimsService) {}
 
   @Post()
   @UseGuards(AdminGuard)
+  @ApiBearerAuth()
+  @ApiUnauthorizedResponse({ description: 'Missing or invalid access token.' })
   @ApiForbiddenResponse({ description: 'The access token is not an administrator.' })
   @ApiOperation({ summary: 'Create a claim and score it against the rules' })
   @ApiBody({
@@ -94,6 +92,8 @@ export class ClaimsController {
 
   @Put(':id')
   @UseGuards(AdminGuard)
+  @ApiBearerAuth()
+  @ApiUnauthorizedResponse({ description: 'Missing or invalid access token.' })
   @ApiForbiddenResponse({ description: 'The access token is not an administrator.' })
   @ApiOperation({ summary: 'Update a claim and score it again' })
   @ApiBody({
@@ -110,6 +110,8 @@ export class ClaimsController {
 
   @Delete(':id')
   @UseGuards(AdminGuard)
+  @ApiBearerAuth()
+  @ApiUnauthorizedResponse({ description: 'Missing or invalid access token.' })
   @ApiForbiddenResponse({ description: 'The access token is not an administrator.' })
   @ApiOperation({ summary: 'Delete a claim by ID' })
   @ApiResponse({ status: 200, type: ClaimResponseDto, example: claimResponseExample })
