@@ -9,7 +9,7 @@ import type { GridListArgs } from '../common/grid-query.js';
 import { rethrowUnlessMissing } from '../common/functions.js';
 import { PrismaService } from '../prisma/prisma.service.js';
 import { flagsForClaim } from '../code-rules/refresh-code-flags.js';
-import { claimOutcome } from '../rules/claim-outcomes.js';
+import { claimOutcome } from '../claim-rules/claim-outcomes.js';
 import type { ClaimWrite } from './claim-input.js';
 
 @Injectable()
@@ -121,7 +121,7 @@ export class ClaimsService {
     if (codeType === 'ICD10') {
       const diagnosis = await this.prisma.diagnosisCode.findUnique({ where: { code } });
       if (!diagnosis) {
-        throw new BadRequestException('That diagnosis code is not in the catalog');
+        throw new BadRequestException('That diagnosis code is not in Diagnoses');
       }
       return {
         codeType,
@@ -133,7 +133,7 @@ export class ClaimsService {
 
     const procedure = await this.prisma.procedureCode.findUnique({ where: { code } });
     if (!procedure || procedure.codeType !== codeType) {
-      throw new BadRequestException('That procedure code is not in the catalog');
+      throw new BadRequestException('That procedure code is not in Procedures');
     }
     return {
       codeType,
@@ -149,7 +149,7 @@ export class ClaimsService {
     category: string;
     billedCents: number;
   }) {
-    const rules = await this.prisma.ruleDefinition.findMany();
+    const rules = await this.prisma.claimRule.findMany();
     return claimOutcome(claim, rules);
   }
 }

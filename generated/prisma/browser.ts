@@ -23,11 +23,11 @@ export * from './enums.js';
  */
 export type User = Prisma.UserModel
 /**
- * Model RuleDefinition
- * A cost-management rule. A claim triggers it when the billed amount is at
+ * Model ClaimRule
+ * A claim rule. A claim triggers it when the billed amount is at
  * least minFeeCents and any set code type, code, or category also matches.
  */
-export type RuleDefinition = Prisma.RuleDefinitionModel
+export type ClaimRule = Prisma.ClaimRuleModel
 /**
  * Model Claim
  * 

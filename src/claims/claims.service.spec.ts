@@ -3,7 +3,7 @@ import { ClaimsService } from './claims.service.js';
 
 describe('ClaimsService', () => {
   const prisma = {
-    ruleDefinition: { findMany: vi.fn() },
+    claimRule: { findMany: vi.fn() },
     procedureCode: { findUnique: vi.fn() },
     diagnosisCode: { findUnique: vi.fn() },
     procedureRule: { findMany: vi.fn() },
@@ -33,7 +33,7 @@ describe('ClaimsService', () => {
       category: 'Evaluation and Management',
       shortDescription: 'Office visit',
     });
-    prisma.ruleDefinition.findMany.mockResolvedValue([
+    prisma.claimRule.findMany.mockResolvedValue([
       {
         enabled: true,
         codeType: null,
@@ -64,7 +64,7 @@ describe('ClaimsService', () => {
     });
   });
 
-  it('rejects a procedure code that is not in the catalog', async () => {
+  it('rejects a procedure code that is not in Procedures', async () => {
     prisma.procedureCode.findUnique.mockResolvedValue(null);
 
     await expect(

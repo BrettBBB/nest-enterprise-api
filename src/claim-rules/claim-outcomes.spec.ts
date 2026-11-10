@@ -1,7 +1,7 @@
-import { claimOutcome, ruleMatches } from './claim-outcomes.js';
-import { ruleCatalog } from './rule-catalog.js';
+import { claimOutcome, claimRuleMatches } from './claim-outcomes.js';
+import { claimRuleSeeds } from './claim-rule-seeds.js';
 
-const highDollar = ruleCatalog[0];
+const highDollar = claimRuleSeeds[0];
 
 describe('claimOutcome', () => {
   it('triggers a high-dollar office claim and passes a small one', () => {
@@ -12,16 +12,16 @@ describe('claimOutcome', () => {
       billedCents: 750_000,
     };
 
-    expect(ruleMatches(highDollar, claim)).toBe(true);
-    expect(claimOutcome(claim, ruleCatalog)).toBe('TRIGGERED');
+    expect(claimRuleMatches(highDollar, claim)).toBe(true);
+    expect(claimOutcome(claim, claimRuleSeeds)).toBe('TRIGGERED');
     expect(
-      claimOutcome({ ...claim, billedCents: 12_800 }, ruleCatalog),
+      claimOutcome({ ...claim, billedCents: 12_800 }, claimRuleSeeds),
     ).toBe('PASSED');
   });
 
   it('ignores a disabled rule', () => {
     expect(
-      ruleMatches({ ...highDollar, enabled: false }, {
+      claimRuleMatches({ ...highDollar, enabled: false }, {
         codeType: 'CPT',
         code: '99213',
         category: 'Evaluation and Management',

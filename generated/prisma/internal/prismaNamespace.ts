@@ -398,7 +398,7 @@ type FieldRefInputType<Model, FieldType> = Model extends never ? never : FieldRe
 
 export const ModelName = {
   User: 'User',
-  RuleDefinition: 'RuleDefinition',
+  ClaimRule: 'ClaimRule',
   Claim: 'Claim',
   ProcedureCode: 'ProcedureCode',
   DiagnosisCode: 'DiagnosisCode',
@@ -419,7 +419,7 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
     omit: GlobalOmitOptions
   }
   meta: {
-    modelProps: "user" | "ruleDefinition" | "claim" | "procedureCode" | "diagnosisCode" | "procedureRule" | "diagnosisRule"
+    modelProps: "user" | "claimRule" | "claim" | "procedureCode" | "diagnosisCode" | "procedureRule" | "diagnosisRule"
     txIsolationLevel: TransactionIsolationLevel
   }
   model: {
@@ -497,77 +497,77 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
         }
       }
     }
-    RuleDefinition: {
-      payload: Prisma.$RuleDefinitionPayload<ExtArgs>
-      fields: Prisma.RuleDefinitionFieldRefs
+    ClaimRule: {
+      payload: Prisma.$ClaimRulePayload<ExtArgs>
+      fields: Prisma.ClaimRuleFieldRefs
       operations: {
         findUnique: {
-          args: Prisma.RuleDefinitionFindUniqueArgs<ExtArgs>
-          result: runtime.Types.Utils.PayloadToResult<Prisma.$RuleDefinitionPayload> | null
+          args: Prisma.ClaimRuleFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ClaimRulePayload> | null
         }
         findUniqueOrThrow: {
-          args: Prisma.RuleDefinitionFindUniqueOrThrowArgs<ExtArgs>
-          result: runtime.Types.Utils.PayloadToResult<Prisma.$RuleDefinitionPayload>
+          args: Prisma.ClaimRuleFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ClaimRulePayload>
         }
         findFirst: {
-          args: Prisma.RuleDefinitionFindFirstArgs<ExtArgs>
-          result: runtime.Types.Utils.PayloadToResult<Prisma.$RuleDefinitionPayload> | null
+          args: Prisma.ClaimRuleFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ClaimRulePayload> | null
         }
         findFirstOrThrow: {
-          args: Prisma.RuleDefinitionFindFirstOrThrowArgs<ExtArgs>
-          result: runtime.Types.Utils.PayloadToResult<Prisma.$RuleDefinitionPayload>
+          args: Prisma.ClaimRuleFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ClaimRulePayload>
         }
         findMany: {
-          args: Prisma.RuleDefinitionFindManyArgs<ExtArgs>
-          result: runtime.Types.Utils.PayloadToResult<Prisma.$RuleDefinitionPayload>[]
+          args: Prisma.ClaimRuleFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ClaimRulePayload>[]
         }
         create: {
-          args: Prisma.RuleDefinitionCreateArgs<ExtArgs>
-          result: runtime.Types.Utils.PayloadToResult<Prisma.$RuleDefinitionPayload>
+          args: Prisma.ClaimRuleCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ClaimRulePayload>
         }
         createMany: {
-          args: Prisma.RuleDefinitionCreateManyArgs<ExtArgs>
+          args: Prisma.ClaimRuleCreateManyArgs<ExtArgs>
           result: BatchPayload
         }
         createManyAndReturn: {
-          args: Prisma.RuleDefinitionCreateManyAndReturnArgs<ExtArgs>
-          result: runtime.Types.Utils.PayloadToResult<Prisma.$RuleDefinitionPayload>[]
+          args: Prisma.ClaimRuleCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ClaimRulePayload>[]
         }
         delete: {
-          args: Prisma.RuleDefinitionDeleteArgs<ExtArgs>
-          result: runtime.Types.Utils.PayloadToResult<Prisma.$RuleDefinitionPayload>
+          args: Prisma.ClaimRuleDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ClaimRulePayload>
         }
         update: {
-          args: Prisma.RuleDefinitionUpdateArgs<ExtArgs>
-          result: runtime.Types.Utils.PayloadToResult<Prisma.$RuleDefinitionPayload>
+          args: Prisma.ClaimRuleUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ClaimRulePayload>
         }
         deleteMany: {
-          args: Prisma.RuleDefinitionDeleteManyArgs<ExtArgs>
+          args: Prisma.ClaimRuleDeleteManyArgs<ExtArgs>
           result: BatchPayload
         }
         updateMany: {
-          args: Prisma.RuleDefinitionUpdateManyArgs<ExtArgs>
+          args: Prisma.ClaimRuleUpdateManyArgs<ExtArgs>
           result: BatchPayload
         }
         updateManyAndReturn: {
-          args: Prisma.RuleDefinitionUpdateManyAndReturnArgs<ExtArgs>
-          result: runtime.Types.Utils.PayloadToResult<Prisma.$RuleDefinitionPayload>[]
+          args: Prisma.ClaimRuleUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ClaimRulePayload>[]
         }
         upsert: {
-          args: Prisma.RuleDefinitionUpsertArgs<ExtArgs>
-          result: runtime.Types.Utils.PayloadToResult<Prisma.$RuleDefinitionPayload>
+          args: Prisma.ClaimRuleUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ClaimRulePayload>
         }
         aggregate: {
-          args: Prisma.RuleDefinitionAggregateArgs<ExtArgs>
-          result: runtime.Types.Utils.Optional<Prisma.AggregateRuleDefinition>
+          args: Prisma.ClaimRuleAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateClaimRule>
         }
         groupBy: {
-          args: Prisma.RuleDefinitionGroupByArgs<ExtArgs>
-          result: runtime.Types.Utils.Optional<Prisma.RuleDefinitionGroupByOutputType>[]
+          args: Prisma.ClaimRuleGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.ClaimRuleGroupByOutputType>[]
         }
         count: {
-          args: Prisma.RuleDefinitionCountArgs<ExtArgs>
-          result: runtime.Types.Utils.Optional<Prisma.RuleDefinitionCountAggregateOutputType> | number
+          args: Prisma.ClaimRuleCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.ClaimRuleCountAggregateOutputType> | number
         }
       }
     }
@@ -995,7 +995,7 @@ export const UserScalarFieldEnum = {
 export type UserScalarFieldEnum = (typeof UserScalarFieldEnum)[keyof typeof UserScalarFieldEnum]
 
 
-export const RuleDefinitionScalarFieldEnum = {
+export const ClaimRuleScalarFieldEnum = {
   id: 'id',
   name: 'name',
   description: 'description',
@@ -1008,7 +1008,7 @@ export const RuleDefinitionScalarFieldEnum = {
   updatedAt: 'updatedAt'
 } as const
 
-export type RuleDefinitionScalarFieldEnum = (typeof RuleDefinitionScalarFieldEnum)[keyof typeof RuleDefinitionScalarFieldEnum]
+export type ClaimRuleScalarFieldEnum = (typeof ClaimRuleScalarFieldEnum)[keyof typeof ClaimRuleScalarFieldEnum]
 
 
 export const ClaimScalarFieldEnum = {
@@ -1386,7 +1386,7 @@ export interface PrismaClientOptionsWithAdapter extends PrismaClientBaseOptions 
 export type PrismaClientOptions = PrismaClientOptionsWithAccelerateUrl | PrismaClientOptionsWithAdapter
 export type GlobalOmitConfig = {
   user?: Prisma.UserOmit
-  ruleDefinition?: Prisma.RuleDefinitionOmit
+  claimRule?: Prisma.ClaimRuleOmit
   claim?: Prisma.ClaimOmit
   procedureCode?: Prisma.ProcedureCodeOmit
   diagnosisCode?: Prisma.DiagnosisCodeOmit

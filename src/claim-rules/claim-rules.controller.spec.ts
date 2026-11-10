@@ -1,43 +1,46 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { AdminGuard } from '../auth/admin.guard.js';
+import { JwtAuthGuard } from '../auth/jwt-auth.guard.js';
 import { parseGridQuery, toGridListArgs } from '../common/grid-query.js';
-import { createRuleExample, ruleResponseExample, updateRuleExample } from './dto/rule.examples.js';
-import { ruleEnumValues, ruleGridFields, ruleQuickFilterFields } from './rule-grid.js';
-import { RulesController } from './rules.controller.js';
-import { RulesService } from './rules.service.js';
+import { createClaimRuleExample, claimRuleResponseExample, updateClaimRuleExample } from './dto/claim-rule.examples.js';
+import { claimRuleEnumValues, claimRuleGridFields, claimRuleQuickFilterFields } from './claim-rule-grid.js';
+import { ClaimRulesController } from './claim-rules.controller.js';
+import { ClaimRulesService } from './claim-rules.service.js';
 
-describe('RulesController', () => {
-  let controller: RulesController;
-  const rulesService = {
-    createRule: vi.fn(),
-    findRules: vi.fn(),
-    updateRule: vi.fn(),
+describe('ClaimRulesController', () => {
+  let controller: ClaimRulesController;
+  const claimRulesService = {
+    createClaimRule: vi.fn(),
+    findClaimRules: vi.fn(),
+    updateClaimRule: vi.fn(),
   };
 
   beforeEach(async () => {
     vi.clearAllMocks();
     const module: TestingModule = await Test.createTestingModule({
-      controllers: [RulesController],
-      providers: [{ provide: RulesService, useValue: rulesService }],
+      controllers: [ClaimRulesController],
+      providers: [{ provide: ClaimRulesService, useValue: claimRulesService }],
     })
       .overrideGuard(AdminGuard)
       .useValue({ canActivate: () => true })
+      .overrideGuard(JwtAuthGuard)
+      .useValue({ canActivate: () => true })
       .compile();
 
-    controller = module.get(RulesController);
+    controller = module.get(ClaimRulesController);
   });
 
   it('maps a create DTO onto the rule model', async () => {
-    rulesService.createRule.mockResolvedValue(ruleResponseExample);
+    claimRulesService.createClaimRule.mockResolvedValue(claimRuleResponseExample);
 
-    await expect(controller.create({ ...createRuleExample })).resolves.toBe(ruleResponseExample);
-    expect(rulesService.createRule).toHaveBeenCalledWith({
-      name: createRuleExample.name,
-      description: createRuleExample.description,
+    await expect(controller.create({ ...createClaimRuleExample })).resolves.toBe(claimRuleResponseExample);
+    expect(claimRulesService.createClaimRule).toHaveBeenCalledWith({
+      name: createClaimRuleExample.name,
+      description: createClaimRuleExample.description,
       codeType: null,
       code: null,
       category: null,
-      minFeeCents: createRuleExample.minFeeCents,
+      minFeeCents: createClaimRuleExample.minFeeCents,
       enabled: true,
     });
   });
@@ -47,33 +50,33 @@ describe('RulesController', () => {
       paginationModel: { page: 0, pageSize: 25 },
       filterModel: { items: [{ field: 'enabled', operator: 'is', value: true }] },
     });
-    rulesService.findRules.mockResolvedValue({ rows: [ruleResponseExample], rowCount: 1 });
+    claimRulesService.findClaimRules.mockResolvedValue({ rows: [claimRuleResponseExample], rowCount: 1 });
 
     await expect(controller.findAll(grid)).resolves.toEqual({
-      rows: [ruleResponseExample],
+      rows: [claimRuleResponseExample],
       rowCount: 1,
     });
-    expect(rulesService.findRules).toHaveBeenCalledWith(
+    expect(claimRulesService.findClaimRules).toHaveBeenCalledWith(
       toGridListArgs(await parseGridQuery(grid), {
-        fields: ruleGridFields,
-        enumValues: ruleEnumValues,
-        quickFilterFields: ruleQuickFilterFields,
+        fields: claimRuleGridFields,
+        enumValues: claimRuleEnumValues,
+        quickFilterFields: claimRuleQuickFilterFields,
       }),
     );
   });
 
   it('maps an update and leaves omitted fields unset', async () => {
-    rulesService.updateRule.mockResolvedValue(ruleResponseExample);
+    claimRulesService.updateClaimRule.mockResolvedValue(claimRuleResponseExample);
 
-    await controller.update({ id: ruleResponseExample.id }, { ...updateRuleExample });
+    await controller.update({ id: claimRuleResponseExample.id }, { ...updateClaimRuleExample });
 
-    expect(rulesService.updateRule).toHaveBeenCalledWith(ruleResponseExample.id, {
+    expect(claimRulesService.updateClaimRule).toHaveBeenCalledWith(claimRuleResponseExample.id, {
       name: undefined,
       description: undefined,
       codeType: undefined,
       code: undefined,
       category: undefined,
-      minFeeCents: updateRuleExample.minFeeCents,
+      minFeeCents: updateClaimRuleExample.minFeeCents,
       enabled: false,
     });
   });

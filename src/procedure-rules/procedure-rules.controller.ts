@@ -10,6 +10,7 @@ import {
   ApiUnauthorizedResponse,
 } from '@nestjs/swagger';
 import { AdminGuard } from '../auth/admin.guard.js';
+import { JwtAuthGuard } from '../auth/jwt-auth.guard.js';
 import { parseGridQuery, toGridListArgs } from '../common/grid-query.js';
 import { CreateProcedureRuleDto } from './dto/create-procedure-rule.dto.js';
 import { ProcedureRuleIdParamDto } from './dto/procedure-rule-id-param.dto.js';
@@ -33,13 +34,14 @@ import { ProcedureRulesService } from './procedure-rules.service.js';
 @ApiTags('procedure-rules')
 @ApiBearerAuth()
 @ApiUnauthorizedResponse({ description: 'Missing or invalid access token.' })
-@ApiForbiddenResponse({ description: 'The access token is not an administrator.' })
-@UseGuards(AdminGuard)
+@UseGuards(JwtAuthGuard)
 @Controller('procedure-rules')
 export class ProcedureRulesController {
   constructor(private readonly procedureRulesService: ProcedureRulesService) {}
 
   @Post()
+  @UseGuards(AdminGuard)
+  @ApiForbiddenResponse({ description: 'The access token is not an administrator.' })
   @ApiOperation({ summary: 'Create a procedure cost rule' })
   @ApiBody({
     type: CreateProcedureRuleDto,
@@ -81,6 +83,8 @@ export class ProcedureRulesController {
   }
 
   @Put(':id')
+  @UseGuards(AdminGuard)
+  @ApiForbiddenResponse({ description: 'The access token is not an administrator.' })
   @ApiOperation({ summary: 'Update a procedure cost rule by ID' })
   @ApiBody({
     type: UpdateProcedureRuleDto,
@@ -99,6 +103,8 @@ export class ProcedureRulesController {
   }
 
   @Delete(':id')
+  @UseGuards(AdminGuard)
+  @ApiForbiddenResponse({ description: 'The access token is not an administrator.' })
   @ApiOperation({ summary: 'Delete a procedure cost rule by ID' })
   @ApiResponse({ status: 200, type: ProcedureRuleResponseDto, example: procedureRuleResponseExample })
   @ApiResponse({ status: 404, description: 'Procedure rule not found.' })

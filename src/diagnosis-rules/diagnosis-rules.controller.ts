@@ -10,6 +10,7 @@ import {
   ApiUnauthorizedResponse,
 } from '@nestjs/swagger';
 import { AdminGuard } from '../auth/admin.guard.js';
+import { JwtAuthGuard } from '../auth/jwt-auth.guard.js';
 import { parseGridQuery, toGridListArgs } from '../common/grid-query.js';
 import { DiagnosisRulesService } from './diagnosis-rules.service.js';
 import { CreateDiagnosisRuleDto } from './dto/create-diagnosis-rule.dto.js';
@@ -29,13 +30,14 @@ import { diagnosisRuleGridFields, diagnosisRuleQuickFilterFields } from './diagn
 @ApiTags('diagnosis-rules')
 @ApiBearerAuth()
 @ApiUnauthorizedResponse({ description: 'Missing or invalid access token.' })
-@ApiForbiddenResponse({ description: 'The access token is not an administrator.' })
-@UseGuards(AdminGuard)
+@UseGuards(JwtAuthGuard)
 @Controller('diagnosis-rules')
 export class DiagnosisRulesController {
   constructor(private readonly diagnosisRulesService: DiagnosisRulesService) {}
 
   @Post()
+  @UseGuards(AdminGuard)
+  @ApiForbiddenResponse({ description: 'The access token is not an administrator.' })
   @ApiOperation({ summary: 'Create a diagnosis cost rule' })
   @ApiBody({
     type: CreateDiagnosisRuleDto,
@@ -76,6 +78,8 @@ export class DiagnosisRulesController {
   }
 
   @Put(':id')
+  @UseGuards(AdminGuard)
+  @ApiForbiddenResponse({ description: 'The access token is not an administrator.' })
   @ApiOperation({ summary: 'Update a diagnosis cost rule by ID' })
   @ApiBody({
     type: UpdateDiagnosisRuleDto,
@@ -94,6 +98,8 @@ export class DiagnosisRulesController {
   }
 
   @Delete(':id')
+  @UseGuards(AdminGuard)
+  @ApiForbiddenResponse({ description: 'The access token is not an administrator.' })
   @ApiOperation({ summary: 'Delete a diagnosis cost rule by ID' })
   @ApiResponse({ status: 200, type: DiagnosisRuleResponseDto, example: diagnosisRuleResponseExample })
   @ApiResponse({ status: 404, description: 'Diagnosis rule not found.' })

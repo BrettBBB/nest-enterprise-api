@@ -30,9 +30,9 @@ enum ClaimOutcome {
   PASSED
 }
 
-/// A cost-management rule. A claim triggers it when the billed amount is at
+/// A claim rule. A claim triggers it when the billed amount is at
 /// least minFeeCents and any set code type, code, or category also matches.
-model RuleDefinition {
+model ClaimRule {
   id          String           @id @default(cuid())
   name        String           @unique
   description String

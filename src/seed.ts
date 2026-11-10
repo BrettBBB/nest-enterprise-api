@@ -155,7 +155,7 @@ async function seedClaimRules(rules: ClaimRuleSeed[]) {
       minFeeCents: rule.minFeeCents,
       enabled: rule.enabled,
     };
-    await prisma.ruleDefinition.upsert({
+    await prisma.claimRule.upsert({
       where: { name: rule.name },
       update: data,
       create: { id: rule.id, name: rule.name, ...data },

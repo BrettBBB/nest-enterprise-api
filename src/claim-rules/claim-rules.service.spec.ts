@@ -1,10 +1,10 @@
 import { ConflictException } from '@nestjs/common';
 import { Prisma } from '../../generated/prisma/client.js';
-import { RulesService } from './rules.service.js';
+import { ClaimRulesService } from './claim-rules.service.js';
 
-describe('RulesService', () => {
+describe('ClaimRulesService', () => {
   const prisma = {
-    ruleDefinition: {
+    claimRule: {
       create: vi.fn(),
       findMany: vi.fn(),
       count: vi.fn(),
@@ -16,26 +16,26 @@ describe('RulesService', () => {
       update: vi.fn(),
     },
   };
-  const service = new RulesService(prisma as never);
+  const service = new ClaimRulesService(prisma as never);
 
   beforeEach(() => {
     vi.clearAllMocks();
-    prisma.ruleDefinition.findMany.mockResolvedValue([]);
+    prisma.claimRule.findMany.mockResolvedValue([]);
     prisma.claim.findMany.mockResolvedValue([]);
   });
 
   it('passes the grid where, sort, and page to the database', async () => {
-    prisma.ruleDefinition.findMany.mockResolvedValue([]);
-    prisma.ruleDefinition.count.mockResolvedValue(0);
+    prisma.claimRule.findMany.mockResolvedValue([]);
+    prisma.claimRule.count.mockResolvedValue(0);
 
-    await service.findRules({
+    await service.findClaimRules({
       where: { enabled: true },
       orderBy: [{ name: 'asc' }],
       skip: 0,
       take: 25,
     });
 
-    expect(prisma.ruleDefinition.findMany).toHaveBeenCalledWith({
+    expect(prisma.claimRule.findMany).toHaveBeenCalledWith({
       where: { enabled: true },
       orderBy: [{ name: 'asc' }],
       skip: 0,
@@ -44,8 +44,8 @@ describe('RulesService', () => {
   });
 
   it('refreshes claim outcomes after a rule is saved', async () => {
-    prisma.ruleDefinition.create.mockResolvedValue({ id: 'rule-1' });
-    prisma.ruleDefinition.findMany.mockResolvedValue([
+    prisma.claimRule.create.mockResolvedValue({ id: 'rule-1' });
+    prisma.claimRule.findMany.mockResolvedValue([
       {
         enabled: true,
         codeType: null,
@@ -65,7 +65,7 @@ describe('RulesService', () => {
       },
     ]);
 
-    await service.createRule({
+    await service.createClaimRule({
       name: 'High dollar claim',
       description: 'Any claim billed at $5,000 or more.',
       codeType: null,
@@ -82,7 +82,7 @@ describe('RulesService', () => {
   });
 
   it('turns a duplicate name into a conflict', async () => {
-    prisma.ruleDefinition.create.mockRejectedValue(
+    prisma.claimRule.create.mockRejectedValue(
       new Prisma.PrismaClientKnownRequestError('duplicate', {
         code: 'P2002',
         clientVersion: 'test',
@@ -90,7 +90,7 @@ describe('RulesService', () => {
     );
 
     await expect(
-      service.createRule({
+      service.createClaimRule({
         name: 'High dollar claim',
         description: 'Any claim billed at $5,000 or more.',
         minFeeCents: 500_000,

@@ -29,7 +29,7 @@ async function bootstrap() {
     .addTag('users')
     .addTag('procedure-codes')
     .addTag('diagnosis-codes')
-    .addTag('rule-definitions')
+    .addTag('claim-rules')
     .addTag('procedure-rules')
     .addTag('diagnosis-rules')
     .addTag('claims')

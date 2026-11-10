@@ -52,7 +52,7 @@ export const AnyNull = runtime.AnyNull
 
 export const ModelName = {
   User: 'User',
-  RuleDefinition: 'RuleDefinition',
+  ClaimRule: 'ClaimRule',
   Claim: 'Claim',
   ProcedureCode: 'ProcedureCode',
   DiagnosisCode: 'DiagnosisCode',
@@ -91,7 +91,7 @@ export const UserScalarFieldEnum = {
 export type UserScalarFieldEnum = (typeof UserScalarFieldEnum)[keyof typeof UserScalarFieldEnum]
 
 
-export const RuleDefinitionScalarFieldEnum = {
+export const ClaimRuleScalarFieldEnum = {
   id: 'id',
   name: 'name',
   description: 'description',
@@ -104,7 +104,7 @@ export const RuleDefinitionScalarFieldEnum = {
   updatedAt: 'updatedAt'
 } as const
 
-export type RuleDefinitionScalarFieldEnum = (typeof RuleDefinitionScalarFieldEnum)[keyof typeof RuleDefinitionScalarFieldEnum]
+export type ClaimRuleScalarFieldEnum = (typeof ClaimRuleScalarFieldEnum)[keyof typeof ClaimRuleScalarFieldEnum]
 
 
 export const ClaimScalarFieldEnum = {

@@ -8,7 +8,7 @@ export type ProcedureRuleSeed = {
   enabled: boolean;
 };
 
-export const procedureRuleCatalog: readonly ProcedureRuleSeed[] = [
+export const procedureRuleSeeds: readonly ProcedureRuleSeed[] = [
   {
     name: 'High cost procedure',
     description: 'Flag a procedure whose standard cost is $5,000 or more.',

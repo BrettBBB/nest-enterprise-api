@@ -1,17 +1,17 @@
 import { ConflictException, Injectable, NotFoundException } from '@nestjs/common';
-import { Prisma, type RuleDefinition } from '../../generated/prisma/client.js';
+import { Prisma, type ClaimRule } from '../../generated/prisma/client.js';
 import type { GridListArgs } from '../common/grid-query.js';
 import { rethrowUnlessMissing } from '../common/functions.js';
 import { PrismaService } from '../prisma/prisma.service.js';
 import { refreshClaimOutcomes } from './claim-outcomes.js';
 
 @Injectable()
-export class RulesService {
+export class ClaimRulesService {
   constructor(private readonly prisma: PrismaService) {}
 
-  async createRule(data: Prisma.RuleDefinitionCreateInput) {
+  async createClaimRule(data: Prisma.ClaimRuleCreateInput) {
     try {
-      const rule = await this.prisma.ruleDefinition.create({ data });
+      const rule = await this.prisma.claimRule.create({ data });
       await refreshClaimOutcomes(this.prisma);
       return rule;
     } catch (error) {
@@ -19,33 +19,33 @@ export class RulesService {
     }
   }
 
-  async findRules(args: GridListArgs) {
-    const where = args.where as Prisma.RuleDefinitionWhereInput;
+  async findClaimRules(args: GridListArgs) {
+    const where = args.where as Prisma.ClaimRuleWhereInput;
     const [rows, rowCount] = await Promise.all([
-      this.prisma.ruleDefinition.findMany({
+      this.prisma.claimRule.findMany({
         where,
         ...(args.orderBy
-          ? { orderBy: args.orderBy as Prisma.RuleDefinitionOrderByWithRelationInput[] }
+          ? { orderBy: args.orderBy as Prisma.ClaimRuleOrderByWithRelationInput[] }
           : {}),
         ...(args.skip != null ? { skip: args.skip } : {}),
         ...(args.take != null ? { take: args.take } : {}),
       }),
-      this.prisma.ruleDefinition.count({ where }),
+      this.prisma.claimRule.count({ where }),
     ]);
     return { rows, rowCount };
   }
 
-  async findRuleById(id: RuleDefinition['id']) {
-    const rule = await this.prisma.ruleDefinition.findUnique({ where: { id } });
+  async findClaimRuleById(id: ClaimRule['id']) {
+    const rule = await this.prisma.claimRule.findUnique({ where: { id } });
     if (!rule) {
-      throw new NotFoundException('Rule not found');
+      throw new NotFoundException('Claim rule not found');
     }
     return rule;
   }
 
-  async updateRule(id: RuleDefinition['id'], data: Prisma.RuleDefinitionUpdateInput) {
+  async updateClaimRule(id: ClaimRule['id'], data: Prisma.ClaimRuleUpdateInput) {
     try {
-      const rule = await this.prisma.ruleDefinition.update({ where: { id }, data });
+      const rule = await this.prisma.claimRule.update({ where: { id }, data });
       await refreshClaimOutcomes(this.prisma);
       return rule;
     } catch (error) {
@@ -53,20 +53,20 @@ export class RulesService {
     }
   }
 
-  async deleteRule(id: RuleDefinition['id']) {
+  async deleteClaimRule(id: ClaimRule['id']) {
     try {
-      const rule = await this.prisma.ruleDefinition.delete({ where: { id } });
+      const rule = await this.prisma.claimRule.delete({ where: { id } });
       await refreshClaimOutcomes(this.prisma);
       return rule;
     } catch (error) {
-      rethrowUnlessMissing(error, 'Rule not found');
+      rethrowUnlessMissing(error, 'Claim rule not found');
     }
   }
 }
 
 function rethrowDuplicate(error: unknown): never {
   if (error instanceof Prisma.PrismaClientKnownRequestError && error.code === 'P2002') {
-    throw new ConflictException('That rule name already exists');
+    throw new ConflictException('That claim rule name already exists');
   }
-  rethrowUnlessMissing(error, 'Rule not found');
+  rethrowUnlessMissing(error, 'Claim rule not found');
 }

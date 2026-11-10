@@ -13,7 +13,7 @@ import {
 } from 'class-validator';
 import { trimString } from '../../common/functions.js';
 import { medicalCodeTypes } from '../../common/code-types.js';
-import { updateRuleExample } from './rule.examples.js';
+import { updateClaimRuleExample } from './claim-rule.examples.js';
 
 function emptyToNull({ value }: { value: unknown }) {
   if (typeof value !== 'string') {
@@ -23,7 +23,7 @@ function emptyToNull({ value }: { value: unknown }) {
   return trimmed === '' ? null : trimmed;
 }
 
-export class UpdateRuleDto {
+export class UpdateClaimRuleDto {
   @ApiPropertyOptional({ maxLength: 80 })
   @IsOptional()
   @IsString()
@@ -60,7 +60,7 @@ export class UpdateRuleDto {
   @Transform(emptyToNull)
   category?: string | null;
 
-  @ApiPropertyOptional({ example: updateRuleExample.minFeeCents, minimum: 0, maximum: 50_000_000 })
+  @ApiPropertyOptional({ example: updateClaimRuleExample.minFeeCents, minimum: 0, maximum: 50_000_000 })
   @IsOptional()
   @IsInt()
   @Min(0)
@@ -68,7 +68,7 @@ export class UpdateRuleDto {
   @Type(() => Number)
   minFeeCents?: number;
 
-  @ApiPropertyOptional({ example: updateRuleExample.enabled })
+  @ApiPropertyOptional({ example: updateClaimRuleExample.enabled })
   @IsOptional()
   @IsBoolean()
   enabled?: boolean;

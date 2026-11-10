@@ -1,11 +1,11 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { rulePageExample } from './rule.examples.js';
-import { RuleResponseDto } from './rule-response.dto.js';
+import { claimRulePageExample } from './claim-rule.examples.js';
+import { ClaimRuleResponseDto } from './claim-rule-response.dto.js';
 
-export class RuleGridPageDto {
-  @ApiProperty({ type: [RuleResponseDto], example: rulePageExample.rows })
-  rows: RuleResponseDto[];
+export class ClaimRuleGridPageDto {
+  @ApiProperty({ type: [ClaimRuleResponseDto], example: claimRulePageExample.rows })
+  rows: ClaimRuleResponseDto[];
 
-  @ApiProperty({ example: rulePageExample.rowCount, minimum: 0 })
+  @ApiProperty({ example: claimRulePageExample.rowCount, minimum: 0 })
   rowCount: number;
 }

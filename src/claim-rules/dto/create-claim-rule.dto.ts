@@ -13,7 +13,7 @@ import {
 } from 'class-validator';
 import { trimString } from '../../common/functions.js';
 import { medicalCodeTypes } from '../../common/code-types.js';
-import { createRuleExample } from './rule.examples.js';
+import { createClaimRuleExample } from './claim-rule.examples.js';
 
 function emptyToNull({ value }: { value: unknown }) {
   if (typeof value !== 'string') {
@@ -23,15 +23,15 @@ function emptyToNull({ value }: { value: unknown }) {
   return trimmed === '' ? null : trimmed;
 }
 
-export class CreateRuleDto {
-  @ApiProperty({ example: createRuleExample.name, maxLength: 80 })
+export class CreateClaimRuleDto {
+  @ApiProperty({ example: createClaimRuleExample.name, maxLength: 80 })
   @IsString()
   @IsNotEmpty()
   @MaxLength(80)
   @Transform(trimString)
   name: string;
 
-  @ApiProperty({ example: createRuleExample.description, maxLength: 500 })
+  @ApiProperty({ example: createClaimRuleExample.description, maxLength: 500 })
   @IsString()
   @IsNotEmpty()
   @MaxLength(500)
@@ -58,14 +58,14 @@ export class CreateRuleDto {
   @Transform(emptyToNull)
   category?: string | null;
 
-  @ApiProperty({ example: createRuleExample.minFeeCents, minimum: 0, maximum: 50_000_000 })
+  @ApiProperty({ example: createClaimRuleExample.minFeeCents, minimum: 0, maximum: 50_000_000 })
   @IsInt()
   @Min(0)
   @Max(50_000_000)
   @Type(() => Number)
   minFeeCents: number;
 
-  @ApiPropertyOptional({ example: createRuleExample.enabled, default: true })
+  @ApiPropertyOptional({ example: createClaimRuleExample.enabled, default: true })
   @IsOptional()
   @IsBoolean()
   enabled?: boolean;

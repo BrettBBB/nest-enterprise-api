@@ -20,6 +20,7 @@ import {
   ApiUnauthorizedResponse,
 } from '@nestjs/swagger';
 import { AdminGuard } from '../auth/admin.guard.js';
+import { JwtAuthGuard } from '../auth/jwt-auth.guard.js';
 import { parseGridQuery, toGridListArgs } from '../common/grid-query.js';
 import { claimEnumValues, claimGridFields, claimQuickFilterFields } from './claim-grid.js';
 import { toClaimCreateInput, toClaimUpdateInput } from './claim-input.js';
@@ -39,20 +40,21 @@ import { UpdateClaimDto } from './dto/update-claim.dto.js';
 @ApiTags('claims')
 @ApiBearerAuth()
 @ApiUnauthorizedResponse({ description: 'Missing or invalid access token.' })
-@ApiForbiddenResponse({ description: 'The access token is not an administrator.' })
-@UseGuards(AdminGuard)
+@UseGuards(JwtAuthGuard)
 @Controller('claims')
 export class ClaimsController {
   constructor(private readonly claimsService: ClaimsService) {}
 
   @Post()
+  @UseGuards(AdminGuard)
+  @ApiForbiddenResponse({ description: 'The access token is not an administrator.' })
   @ApiOperation({ summary: 'Create a claim and score it against the rules' })
   @ApiBody({
     type: CreateClaimDto,
     examples: { sample: { summary: 'High dollar office visit', value: createClaimExample } },
   })
   @ApiResponse({ status: 201, type: ClaimResponseDto, example: claimResponseExample })
-  @ApiResponse({ status: 400, description: 'Invalid input, or the medical code is not in the catalog.' })
+  @ApiResponse({ status: 400, description: 'Invalid input, or the code is not in Procedures or Diagnoses.' })
   @ApiResponse({ status: 409, description: 'That claim number already exists.' })
   async create(@Body() dto: CreateClaimDto) {
     return this.claimsService.createClaim(toClaimCreateInput(dto));
@@ -91,13 +93,15 @@ export class ClaimsController {
   }
 
   @Put(':id')
+  @UseGuards(AdminGuard)
+  @ApiForbiddenResponse({ description: 'The access token is not an administrator.' })
   @ApiOperation({ summary: 'Update a claim and score it again' })
   @ApiBody({
     type: UpdateClaimDto,
     examples: { sample: { summary: 'Lower the billed amount', value: updateClaimExample } },
   })
   @ApiResponse({ status: 200, type: ClaimResponseDto, example: { ...claimResponseExample, ...updateClaimExample, outcome: 'PASSED' } })
-  @ApiResponse({ status: 400, description: 'Invalid input, or the medical code is not in the catalog.' })
+  @ApiResponse({ status: 400, description: 'Invalid input, or the code is not in Procedures or Diagnoses.' })
   @ApiResponse({ status: 404, description: 'Claim not found.' })
   @ApiResponse({ status: 409, description: 'That claim number already exists.' })
   async update(@Param() params: ClaimIdParamDto, @Body() dto: UpdateClaimDto) {
@@ -105,6 +109,8 @@ export class ClaimsController {
   }
 
   @Delete(':id')
+  @UseGuards(AdminGuard)
+  @ApiForbiddenResponse({ description: 'The access token is not an administrator.' })
   @ApiOperation({ summary: 'Delete a claim by ID' })
   @ApiResponse({ status: 200, type: ClaimResponseDto, example: claimResponseExample })
   @ApiResponse({ status: 404, description: 'Claim not found.' })

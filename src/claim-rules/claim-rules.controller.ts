@@ -20,47 +20,49 @@ import {
   ApiUnauthorizedResponse,
 } from '@nestjs/swagger';
 import { AdminGuard } from '../auth/admin.guard.js';
+import { JwtAuthGuard } from '../auth/jwt-auth.guard.js';
 import { parseGridQuery, toGridListArgs } from '../common/grid-query.js';
-import { CreateRuleDto } from './dto/create-rule.dto.js';
-import { RuleGridPageDto } from './dto/rule-page.dto.js';
-import { RuleIdParamDto } from './dto/rule-id-param.dto.js';
-import { RuleResponseDto } from './dto/rule-response.dto.js';
+import { CreateClaimRuleDto } from './dto/create-claim-rule.dto.js';
+import { ClaimRuleGridPageDto } from './dto/claim-rule-page.dto.js';
+import { ClaimRuleIdParamDto } from './dto/claim-rule-id-param.dto.js';
+import { ClaimRuleResponseDto } from './dto/claim-rule-response.dto.js';
 import {
-  createRuleExample,
-  rulePageExample,
-  ruleResponseExample,
-  updateRuleExample,
-} from './dto/rule.examples.js';
-import { UpdateRuleDto } from './dto/update-rule.dto.js';
-import { ruleEnumValues, ruleGridFields, ruleQuickFilterFields } from './rule-grid.js';
-import { toRuleCreateInput, toRuleUpdateInput } from './rule-input.js';
-import { RulesService } from './rules.service.js';
+  createClaimRuleExample,
+  claimRulePageExample,
+  claimRuleResponseExample,
+  updateClaimRuleExample,
+} from './dto/claim-rule.examples.js';
+import { UpdateClaimRuleDto } from './dto/update-claim-rule.dto.js';
+import { claimRuleEnumValues, claimRuleGridFields, claimRuleQuickFilterFields } from './claim-rule-grid.js';
+import { toClaimRuleCreateInput, toClaimRuleUpdateInput } from './claim-rule-input.js';
+import { ClaimRulesService } from './claim-rules.service.js';
 
-@ApiTags('rule-definitions')
+@ApiTags('claim-rules')
 @ApiBearerAuth()
 @ApiUnauthorizedResponse({ description: 'Missing or invalid access token.' })
-@ApiForbiddenResponse({ description: 'The access token is not an administrator.' })
-@UseGuards(AdminGuard)
-@Controller('rule-definitions')
-export class RulesController {
-  constructor(private readonly rulesService: RulesService) {}
+@UseGuards(JwtAuthGuard)
+@Controller('claim-rules')
+export class ClaimRulesController {
+  constructor(private readonly claimRulesService: ClaimRulesService) {}
 
   @Post()
-  @ApiOperation({ summary: 'Create a cost-management rule' })
+  @UseGuards(AdminGuard)
+  @ApiForbiddenResponse({ description: 'The access token is not an administrator.' })
+  @ApiOperation({ summary: 'Create a claim rule' })
   @ApiBody({
-    type: CreateRuleDto,
-    examples: { sample: { summary: 'High dollar claim', value: createRuleExample } },
+    type: CreateClaimRuleDto,
+    examples: { sample: { summary: 'High dollar claim', value: createClaimRuleExample } },
   })
-  @ApiResponse({ status: 201, type: RuleResponseDto, example: ruleResponseExample })
+  @ApiResponse({ status: 201, type: ClaimRuleResponseDto, example: claimRuleResponseExample })
   @ApiResponse({ status: 400, description: 'Invalid input or validation failed.' })
   @ApiResponse({ status: 409, description: 'That rule name already exists.' })
-  async create(@Body() dto: CreateRuleDto) {
-    return this.rulesService.createRule(toRuleCreateInput(dto));
+  async create(@Body() dto: CreateClaimRuleDto) {
+    return this.claimRulesService.createClaimRule(toClaimRuleCreateInput(dto));
   }
 
   @Get()
   @ApiOperation({
-    summary: 'List cost-management rules',
+    summary: 'List claim rules',
     description:
       'The grid query pages, sorts, and filters in the database. A rule matches a claim at or above its minimum fee when the code type, code, and category it sets also match.',
   })
@@ -69,50 +71,54 @@ export class RulesController {
     required: false,
     description: 'JSON GridGetRowsParams: paginationModel, sortModel, and filterModel are optional.',
   })
-  @ApiResponse({ status: 200, type: RuleGridPageDto, example: rulePageExample })
+  @ApiResponse({ status: 200, type: ClaimRuleGridPageDto, example: claimRulePageExample })
   @ApiResponse({ status: 400, description: 'Invalid filter, sort, or page.' })
   async findAll(@Query('grid') grid?: string) {
     const query = await parseGridQuery(grid);
-    return this.rulesService.findRules(
+    return this.claimRulesService.findClaimRules(
       toGridListArgs(query, {
-        fields: ruleGridFields,
-        enumValues: ruleEnumValues,
-        quickFilterFields: ruleQuickFilterFields,
+        fields: claimRuleGridFields,
+        enumValues: claimRuleEnumValues,
+        quickFilterFields: claimRuleQuickFilterFields,
       }),
     );
   }
 
   @Get(':id')
-  @ApiOperation({ summary: 'Retrieve a rule by ID' })
-  @ApiResponse({ status: 200, type: RuleResponseDto, example: ruleResponseExample })
+  @ApiOperation({ summary: 'Retrieve a claim rule by ID' })
+  @ApiResponse({ status: 200, type: ClaimRuleResponseDto, example: claimRuleResponseExample })
   @ApiResponse({ status: 404, description: 'Rule not found.' })
-  async findOne(@Param() params: RuleIdParamDto) {
-    return this.rulesService.findRuleById(params.id);
+  async findOne(@Param() params: ClaimRuleIdParamDto) {
+    return this.claimRulesService.findClaimRuleById(params.id);
   }
 
   @Put(':id')
-  @ApiOperation({ summary: 'Update a rule by ID' })
+  @UseGuards(AdminGuard)
+  @ApiForbiddenResponse({ description: 'The access token is not an administrator.' })
+  @ApiOperation({ summary: 'Update a claim rule by ID' })
   @ApiBody({
-    type: UpdateRuleDto,
-    examples: { sample: { summary: 'Sample update', value: updateRuleExample } },
+    type: UpdateClaimRuleDto,
+    examples: { sample: { summary: 'Sample update', value: updateClaimRuleExample } },
   })
   @ApiResponse({
     status: 200,
-    type: RuleResponseDto,
-    example: { ...ruleResponseExample, ...updateRuleExample },
+    type: ClaimRuleResponseDto,
+    example: { ...claimRuleResponseExample, ...updateClaimRuleExample },
   })
   @ApiResponse({ status: 400, description: 'Invalid input or validation failed.' })
   @ApiResponse({ status: 404, description: 'Rule not found.' })
   @ApiResponse({ status: 409, description: 'That rule name already exists.' })
-  async update(@Param() params: RuleIdParamDto, @Body() dto: UpdateRuleDto) {
-    return this.rulesService.updateRule(params.id, toRuleUpdateInput(dto));
+  async update(@Param() params: ClaimRuleIdParamDto, @Body() dto: UpdateClaimRuleDto) {
+    return this.claimRulesService.updateClaimRule(params.id, toClaimRuleUpdateInput(dto));
   }
 
   @Delete(':id')
-  @ApiOperation({ summary: 'Delete a rule by ID' })
-  @ApiResponse({ status: 200, type: RuleResponseDto, example: ruleResponseExample })
+  @UseGuards(AdminGuard)
+  @ApiForbiddenResponse({ description: 'The access token is not an administrator.' })
+  @ApiOperation({ summary: 'Delete a claim rule by ID' })
+  @ApiResponse({ status: 200, type: ClaimRuleResponseDto, example: claimRuleResponseExample })
   @ApiResponse({ status: 404, description: 'Rule not found.' })
-  async delete(@Param() params: RuleIdParamDto) {
-    return this.rulesService.deleteRule(params.id);
+  async delete(@Param() params: ClaimRuleIdParamDto) {
+    return this.claimRulesService.deleteClaimRule(params.id);
   }
 }

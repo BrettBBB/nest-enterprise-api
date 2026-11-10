@@ -2,10 +2,10 @@ import { ApiProperty } from '@nestjs/swagger';
 import { Transform } from 'class-transformer';
 import { IsNotEmpty, IsString } from 'class-validator';
 import { trimString } from '../../common/functions.js';
-import { ruleIdExample } from './rule.examples.js';
+import { claimRuleIdExample } from './claim-rule.examples.js';
 
-export class RuleIdParamDto {
-  @ApiProperty({ example: ruleIdExample })
+export class ClaimRuleIdParamDto {
+  @ApiProperty({ example: claimRuleIdExample })
   @IsString()
   @IsNotEmpty()
   @Transform(trimString)

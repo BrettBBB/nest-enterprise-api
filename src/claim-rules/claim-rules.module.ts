@@ -1,12 +1,12 @@
 import { Module } from '@nestjs/common';
 import { JwtAuthModule } from '../auth/jwt-auth.module.js';
-import { RulesController } from './rules.controller.js';
-import { RulesService } from './rules.service.js';
+import { ClaimRulesController } from './claim-rules.controller.js';
+import { ClaimRulesService } from './claim-rules.service.js';
 
 @Module({
   imports: [JwtAuthModule],
-  controllers: [RulesController],
-  providers: [RulesService],
-  exports: [RulesService],
+  controllers: [ClaimRulesController],
+  providers: [ClaimRulesService],
+  exports: [ClaimRulesService],
 })
-export class RulesModule {}
+export class ClaimRulesModule {}

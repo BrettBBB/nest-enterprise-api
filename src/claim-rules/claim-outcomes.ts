@@ -1,6 +1,6 @@
 import type { PrismaService } from '../prisma/prisma.service.js';
 
-export type RuleCheck = {
+export type ClaimRuleCheck = {
   enabled: boolean;
   codeType: string | null;
   code: string | null;
@@ -15,7 +15,7 @@ export type ClaimCheck = {
   billedCents: number;
 };
 
-export function ruleMatches(rule: RuleCheck, claim: ClaimCheck): boolean {
+export function claimRuleMatches(rule: ClaimRuleCheck, claim: ClaimCheck): boolean {
   if (!rule.enabled || claim.billedCents < rule.minFeeCents) {
     return false;
   }
@@ -31,12 +31,12 @@ export function ruleMatches(rule: RuleCheck, claim: ClaimCheck): boolean {
   return true;
 }
 
-export function claimOutcome(claim: ClaimCheck, rules: readonly RuleCheck[]): 'TRIGGERED' | 'PASSED' {
-  return rules.some((rule) => ruleMatches(rule, claim)) ? 'TRIGGERED' : 'PASSED';
+export function claimOutcome(claim: ClaimCheck, rules: readonly ClaimRuleCheck[]): 'TRIGGERED' | 'PASSED' {
+  return rules.some((rule) => claimRuleMatches(rule, claim)) ? 'TRIGGERED' : 'PASSED';
 }
 
 export async function refreshClaimOutcomes(prisma: PrismaService): Promise<void> {
-  const rules = await prisma.ruleDefinition.findMany();
+  const rules = await prisma.claimRule.findMany();
   const claims = await prisma.claim.findMany({
     select: {
       id: true,

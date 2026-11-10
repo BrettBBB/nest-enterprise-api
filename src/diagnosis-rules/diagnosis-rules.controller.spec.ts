@@ -1,5 +1,6 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { AdminGuard } from '../auth/admin.guard.js';
+import { JwtAuthGuard } from '../auth/jwt-auth.guard.js';
 import { parseGridQuery, toGridListArgs } from '../common/grid-query.js';
 import { DiagnosisRulesController } from './diagnosis-rules.controller.js';
 import { DiagnosisRulesService } from './diagnosis-rules.service.js';
@@ -25,6 +26,8 @@ describe('DiagnosisRulesController', () => {
       providers: [{ provide: DiagnosisRulesService, useValue: diagnosisRulesService }],
     })
       .overrideGuard(AdminGuard)
+      .useValue({ canActivate: () => true })
+      .overrideGuard(JwtAuthGuard)
       .useValue({ canActivate: () => true })
       .compile();
     controller = module.get(DiagnosisRulesController);

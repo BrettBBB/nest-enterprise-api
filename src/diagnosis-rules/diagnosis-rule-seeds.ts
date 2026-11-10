@@ -8,7 +8,7 @@ export type DiagnosisRuleSeed = {
   enabled: boolean;
 };
 
-export const diagnosisRuleCatalog: readonly DiagnosisRuleSeed[] = [
+export const diagnosisRuleSeeds: readonly DiagnosisRuleSeed[] = [
   {
     name: 'Future HCC cost',
     description: 'Flag an HCC-eligible diagnosis. These conditions raise expected future cost.',

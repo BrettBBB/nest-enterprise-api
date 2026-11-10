@@ -1,5 +1,6 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { AdminGuard } from '../auth/admin.guard.js';
+import { JwtAuthGuard } from '../auth/jwt-auth.guard.js';
 import { parseGridQuery, toGridListArgs } from '../common/grid-query.js';
 import { CodeImportService } from '../code-import/code-import.service.js';
 import { DiagnosisCodesController } from './diagnosis-codes.controller.js';
@@ -26,6 +27,8 @@ describe('DiagnosisCodesController', () => {
       ],
     })
       .overrideGuard(AdminGuard)
+      .useValue({ canActivate: () => true })
+      .overrideGuard(JwtAuthGuard)
       .useValue({ canActivate: () => true })
       .compile();
     controller = module.get(DiagnosisCodesController);

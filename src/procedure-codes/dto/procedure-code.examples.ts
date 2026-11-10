@@ -6,7 +6,7 @@ export const procedureCodeResponseExample = {
   category: 'Evaluation and Management',
   shortDescription: 'Office visit, established patient, low complexity',
   longDescription:
-    'Office visit, established patient, low complexity. CPT 99213 is priced from the catalog fee in Evaluation and Management.',
+    'Office visit, established patient, low complexity. CPT 99213 is priced from the standard cost in Evaluation and Management.',
   workRvu: 1.93,
   peRvu: 1.7,
   mpRvu: 0.15,

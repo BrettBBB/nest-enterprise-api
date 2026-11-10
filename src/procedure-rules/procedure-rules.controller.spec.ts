@@ -1,5 +1,6 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { AdminGuard } from '../auth/admin.guard.js';
+import { JwtAuthGuard } from '../auth/jwt-auth.guard.js';
 import { parseGridQuery, toGridListArgs } from '../common/grid-query.js';
 import {
   createProcedureRuleExample,
@@ -29,6 +30,8 @@ describe('ProcedureRulesController', () => {
       providers: [{ provide: ProcedureRulesService, useValue: procedureRulesService }],
     })
       .overrideGuard(AdminGuard)
+      .useValue({ canActivate: () => true })
+      .overrideGuard(JwtAuthGuard)
       .useValue({ canActivate: () => true })
       .compile();
     controller = module.get(ProcedureRulesController);

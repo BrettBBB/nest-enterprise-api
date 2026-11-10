@@ -1,6 +1,6 @@
 import { Prisma } from '../../generated/prisma/client.js';
-import type { CreateRuleDto } from './dto/create-rule.dto.js';
-import type { UpdateRuleDto } from './dto/update-rule.dto.js';
+import type { CreateClaimRuleDto } from './dto/create-claim-rule.dto.js';
+import type { UpdateClaimRuleDto } from './dto/update-claim-rule.dto.js';
 
 function blankToNull(value: string | null | undefined): string | null | undefined {
   if (value == null) {
@@ -10,7 +10,7 @@ function blankToNull(value: string | null | undefined): string | null | undefine
   return trimmed === '' ? null : trimmed;
 }
 
-export function toRuleCreateInput(dto: CreateRuleDto): Prisma.RuleDefinitionCreateInput {
+export function toClaimRuleCreateInput(dto: CreateClaimRuleDto): Prisma.ClaimRuleCreateInput {
   return {
     name: dto.name.trim(),
     description: dto.description.trim(),
@@ -22,7 +22,7 @@ export function toRuleCreateInput(dto: CreateRuleDto): Prisma.RuleDefinitionCrea
   };
 }
 
-export function toRuleUpdateInput(dto: UpdateRuleDto): Prisma.RuleDefinitionUpdateInput {
+export function toClaimRuleUpdateInput(dto: UpdateClaimRuleDto): Prisma.ClaimRuleUpdateInput {
   return {
     name: dto.name?.trim(),
     description: dto.description?.trim(),

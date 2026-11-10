@@ -1,6 +1,6 @@
 import type { MedicalCodeTypeName } from '../common/code-types.js';
 
-export type RuleSeed = {
+export type ClaimRuleSeed = {
   name: string;
   description: string;
   codeType: MedicalCodeTypeName | null;
@@ -10,7 +10,7 @@ export type RuleSeed = {
   enabled: boolean;
 };
 
-export const ruleCatalog: readonly RuleSeed[] = [
+export const claimRuleSeeds: readonly ClaimRuleSeed[] = [
   {
     name: 'High dollar claim',
     description: 'Any claim billed at $5,000 or more.',

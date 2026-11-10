@@ -1,7 +1,7 @@
 import type { GridFields } from '../common/grid-query.js';
 import { medicalCodeTypes } from '../common/code-types.js';
 
-export const ruleGridFields = {
+export const claimRuleGridFields = {
   name: 'string',
   description: 'string',
   codeType: 'enum',
@@ -13,8 +13,8 @@ export const ruleGridFields = {
   updatedAt: 'date',
 } as const satisfies GridFields;
 
-export const ruleEnumValues = {
+export const claimRuleEnumValues = {
   codeType: medicalCodeTypes,
 } as const;
 
-export const ruleQuickFilterFields = ['name', 'description', 'code', 'category'] as const;
+export const claimRuleQuickFilterFields = ['name', 'description', 'code', 'category'] as const;

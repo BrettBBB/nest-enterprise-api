@@ -9,7 +9,7 @@
  * 🟢 You can import this file directly.
  */
 export type * from './models/User.js'
-export type * from './models/RuleDefinition.js'
+export type * from './models/ClaimRule.js'
 export type * from './models/Claim.js'
 export type * from './models/ProcedureCode.js'
 export type * from './models/DiagnosisCode.js'

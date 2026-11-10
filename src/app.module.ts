@@ -10,7 +10,7 @@ import { DiagnosisCodesModule } from './diagnosis-codes/diagnosis-codes.module.j
 import { DiagnosisRulesModule } from './diagnosis-rules/diagnosis-rules.module.js';
 import { ProcedureCodesModule } from './procedure-codes/procedure-codes.module.js';
 import { ProcedureRulesModule } from './procedure-rules/procedure-rules.module.js';
-import { RulesModule } from './rules/rules.module.js';
+import { ClaimRulesModule } from './claim-rules/claim-rules.module.js';
 import { PrismaModule } from './prisma/prisma.module.js';
 import { UsersModule } from './users/users.module.js';
 
@@ -32,7 +32,7 @@ export const { ObserveModule, ObserveInstrument } = createObserveModule();
     UsersModule,
     ProcedureCodesModule,
     DiagnosisCodesModule,
-    RulesModule,
+    ClaimRulesModule,
     ProcedureRulesModule,
     DiagnosisRulesModule,
     ClaimsModule,
