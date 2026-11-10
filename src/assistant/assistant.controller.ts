@@ -57,7 +57,7 @@ export class AssistantController {
   })
   async ask(@Body() askAssistantDto: AskAssistantDto, @Res() response: Response) {
     const iterator = this.assistantService
-      .answer(askAssistantDto.question)
+      .answer(askAssistantDto.question, askAssistantDto.page)
       [Symbol.asyncIterator]();
     let first: IteratorResult<string>;
     try {

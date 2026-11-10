@@ -32,6 +32,7 @@ describe('AssistantController', () => {
 
     expect(assistantService.answer).toHaveBeenCalledWith(
       askAssistantExample.question,
+      askAssistantExample.page,
     );
     expect(response.status).toHaveBeenCalledWith(200);
     expect(response.writes).toEqual([

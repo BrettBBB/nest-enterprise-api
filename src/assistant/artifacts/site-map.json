@@ -1,0 +1,171 @@
+{
+  "generatedBy": "pnpm site:index",
+  "navigation": [
+    {
+      "label": "Home",
+      "path": "/"
+    },
+    {
+      "label": "Users",
+      "path": "/users"
+    },
+    {
+      "label": "Medical Cost Control",
+      "children": [
+        {
+          "label": "Overview",
+          "path": "/medical-cost-control/overview"
+        },
+        {
+          "label": "Procedures",
+          "path": "/medical-cost-control/procedures"
+        },
+        {
+          "label": "Procedure rules",
+          "path": "/medical-cost-control/procedure-rules"
+        },
+        {
+          "label": "Diagnoses",
+          "path": "/medical-cost-control/diagnoses"
+        },
+        {
+          "label": "Diagnosis rules",
+          "path": "/medical-cost-control/diagnosis-rules"
+        },
+        {
+          "label": "Claims",
+          "path": "/medical-cost-control/claims"
+        },
+        {
+          "label": "Claim Rules",
+          "path": "/medical-cost-control/claim-rules"
+        }
+      ]
+    },
+    {
+      "label": "Contact",
+      "path": "/contact"
+    }
+  ],
+  "pages": [
+    {
+      "path": "/",
+      "title": "Home",
+      "label": "Home",
+      "component": "HomePage",
+      "source": "react-enterprise-client/src/home/HomePage.tsx",
+      "access": "Listed in the primary navigation.",
+      "text": "This application is how I show lead full-stack work: a typed React client, a NestJS API, and a production path from GitHub through Render to Neon Postgres. Sign-in issues a 15-minute access token and a 7-day HttpOnly refresh cookie. When a request receives a 401, the client renews the access token in the background, and role-based access uses the admin claim. Guests can read this page. An administrator can open the user directory, where every page, sort, and filter is requested from the API.\nEngineering Artifacts:\nBrett Brinkhoff\nThe product\nClient\nA Vite and React application in TypeScript, using Material UI. The session keeps the signed-in profile and the short-lived access token, and sends that token with each API request. A 401 exchanges the refresh cookie for a new access token and retries the request. The admin claim decides who can view and edit users.\nAPI\nA NestJS API built as ECMAScript modules. DTO validation checks every request and rejects fields the contract does not declare. Registration cannot set the admin role. An administrator sets it when editing a user. Passwords are stored as scrypt hashes. Sign-in returns the access token in the response and sets the refresh token as an HttpOnly cookie. Each renewal extends that cookie for seven days of activity. Listing or changing users requires an administrator access token, and OpenAPI publishes the contract.\nFrom a push to production\nView System Flow Diagram\nApplication code and database schema each have a deliberate path. GitHub holds the source, Render ships the build, and Neon holds the data.\nDocuments\nReact\nTypeScript\nVite\nMUI\nNestJS\nPrisma\nPostgreSQL\nJWT\nRefresh cookie\nRBAC\nGitHub\nRender\nNeon\nPrisma Migrate\nResume\nSenior Full-Stack Resume (TypeScript, NestJS, React, PostgreSQL)\nMediShare\nCase Study: Modernizing billing architecture and database migration\nCompassion Intl\nCase Study: Scaling global communication to 150M+ messages\nRendi\nCase Study: Rendi Systems Architecture & custom e-commerce engine\n/Case Study - MediShare Incremental Decoupling.pdf\n/Case Study - Compassion International Global Communication.pdf\n/Brett Brinkhoff - Rendi Case Study.pdf\nThe client and the API live in their own repositories. A push is the release candidate. Render is connected to GitHub, so production builds from that commit.\nRender installs dependencies, generates the Prisma client, and compiles the NestJS API. The service starts from that build. The browser origin is configured on the API, so only the deployed client is allowed to call it.\nProduction data is Neon Postgres. The running API uses the pooled connection. Schema changes are applied with Prisma’s deploy command on the direct connection, using the same migration history as local development.\nSystem flow\nBrowser requests to the React client and NestJS API, with Neon, Resend, and Observe\nRequest\nResponse\nHome\nUsers\nContact\nFront end\nDTO check\nBack end\nPostgres\nResend\nObserve\nPooled\nDirect\nMail\nTraces\nThe browser keeps a 15-minute bearer token. A 401 renews it from the 7-day refresh cookie. Render builds the API from GitHub and does not build the client repo. Queries use Neon’s pooled URL. Migrate uses the direct URL, and a push does not migrate on its own.\nClose"
+    },
+    {
+      "path": "/contact",
+      "title": "Contact",
+      "label": "Contact",
+      "component": "ContactPage",
+      "source": "react-enterprise-client/src/contact/ContactPage.tsx",
+      "access": "Listed in the primary navigation.",
+      "text": "Send a note about a role, a project, or a question.\nMessage sent.\nName\nEmail\nMessage\nThe message could not be sent"
+    },
+    {
+      "path": "/sign-in",
+      "title": "Sign in",
+      "label": "Sign in",
+      "component": "LoginPage",
+      "source": "react-enterprise-client/src/auth/LoginPage.tsx",
+      "access": "A signed-in visitor is returned to Home.",
+      "text": "First name\nLast name\nEmail\nPassword\nAge\nAlready have an account? Sign in\nNeed an account? Create one"
+    },
+    {
+      "path": "/users",
+      "title": "Users",
+      "label": "Users",
+      "component": "UsersPage",
+      "source": "react-enterprise-client/src/users/UsersPage.tsx",
+      "access": "Guests see the sign-in form. A signed-in visitor who is not an administrator is told the user directory is limited to administrators.",
+      "text": "Each page, sort, and filter is requested from\nGET /users\nAdd user\nDelete user\nCancel\nFirst name\nLast name\nEmail\nAdmin\nAge\nCreated\nUpdated\nActions\nPromise\nPassword\nAdministrator\nLeave blank to keep the current password.\nLeave blank to keep the current age."
+    },
+    {
+      "path": "/medical-cost-control/overview",
+      "title": "Medical Cost Control | Overview",
+      "label": "Overview",
+      "component": "OverviewPage",
+      "source": "react-enterprise-client/src/medical-cost-control/overview/OverviewPage.tsx",
+      "access": "Listed in the primary navigation.",
+      "text": "I built a similar Cost Management application for a large healthcare provider system. This was recreated from memory over the weekend using partial CPT/HCPCS and ICD-10-CM reference data (about 5,000 codes each).\nMedical Cost Control scores billed claims against procedure and diagnosis reference data. The NestJS API stores the codes, the rules, and the claim results. Anyone can read the grids. Adding, editing, and deleting stay with an administrator. In the original system, we had full RBAC roles (managed via Active Directory) for each user and section.\nCost Control API\nThe API is a NestJS service on PostgreSQL through Prisma. Procedure codes, procedure rules, diagnosis codes, diagnosis rules, claims, and claim rules each have their own resource. A list request sends one grid query, and Postgres applies the page, sort, and filter. Saving a claim looks up the code and stores the billed-amount outcome, the procedure flag, and the diagnosis flag. Saving a procedure or diagnosis rule, or importing a code file, scores every claim again. Saving a claim rule scores the billed-amount outcome. Category menus read the distinct categories. Reading these routes is public. Adding, editing, deleting, and importing codes require an administrator.\nReact display\nThe client is Vite, React, and TypeScript with Material UI. Each section loads on its own. The grids are MUI X DataGrid tables. The grid request goes to the API, and the table shows the page Postgres returned. Billed-amount filters are converted to cents before they leave the browser. Standard cost is sent as the typed dollar amount. Category lists load once for the session and clear after a successful import.\nSections\nNestJS\nPrisma\nPostgreSQL\nOpenAPI\nReact\nTypeScript\nVite\nMUI X\nMedical Cost Control sections\nCPT and HCPCS reference data, including category, RVUs, and standard cost. The grid is read-only. Import Codes replaces the procedure table, then scores every claim again.\nStandard-cost policy for CPT and HCPCS. A claim is marked TRIGGERED when the matching procedure’s standard cost meets the rule minimum and any type, category, or code also matches. Saving a rule scores every claim again.\nICD-10-CM reference data, including category, laterality, and HCC eligibility. The grid is read-only. Import Codes replaces the diagnosis table, then scores every claim again.\nICD-10 policy. A claim is marked TRIGGERED when its diagnosis matches the rule’s code, category, laterality, and HCC requirement. Blank fields match every diagnosis. Saving a rule scores every claim again.\nThe claim register. Each row shows the billed amount, the outcome from claim rules, and the procedure and diagnosis flags. Adding or editing a claim scores that claim.\nBilled-amount policy. A claim is marked TRIGGERED when its billed amount meets the rule minimum and any type, category, or code on the rule also matches. Blank fields match every claim. Saving a rule scores every claim outcome again."
+    },
+    {
+      "path": "/medical-cost-control/procedures",
+      "title": "Medical Cost Control | Procedures",
+      "label": "Procedures",
+      "component": "ProcedureCodesPage",
+      "source": "react-enterprise-client/src/reference/ReferencePages.tsx",
+      "access": "Listed in the primary navigation.",
+      "text": "Code\nType\nCategory\nShort description\nWork RVU\nPE RVU\nMP RVU\nTotal RVU\nStandard cost\nEffective\nCould not load procedure codes\nRead-only CPT and HCPCS reference data. Filters, sort, and pages are applied in the database.\nPromise\nImport Codes"
+    },
+    {
+      "path": "/medical-cost-control/procedure-rules",
+      "title": "Medical Cost Control | Procedure rules",
+      "label": "Procedure rules",
+      "component": "ProcedureRulesPage",
+      "source": "react-enterprise-client/src/medical-cost-control/procedure-rules/ProcedureRulesPage.tsx",
+      "access": "Listed in the primary navigation.",
+      "text": "Add rule\nDelete procedure rule\nCancel\nRule\nDescription\nType\nCategory\nCode\nMinimum cost\nEnabled\nActions\nPromise\nAny\nCPT\nHCPCS\nName\nCode type\nMinimum standard cost (USD)\nEnter a minimum standard cost of zero dollars or more.\nLeave blank to match every code."
+    },
+    {
+      "path": "/medical-cost-control/diagnoses",
+      "title": "Medical Cost Control | Diagnoses",
+      "label": "Diagnoses",
+      "component": "DiagnosisCodesPage",
+      "source": "react-enterprise-client/src/reference/ReferencePages.tsx",
+      "access": "Listed in the primary navigation.",
+      "text": "Code\nCategory\nShort description\nBillable\n7th character\nLaterality\nEpisode\nHCC eligible\nCould not load diagnosis codes\nRead-only ICD-10-CM reference data. Filter HCC eligible to see future high-cost conditions.\nPromise\nImport Codes"
+    },
+    {
+      "path": "/medical-cost-control/diagnosis-rules",
+      "title": "Medical Cost Control | Diagnosis rules",
+      "label": "Diagnosis rules",
+      "component": "DiagnosisRulesPage",
+      "source": "react-enterprise-client/src/medical-cost-control/diagnosis-rules/DiagnosisRulesPage.tsx",
+      "access": "Listed in the primary navigation.",
+      "text": "An ICD-10 claim is flagged when the diagnosis matches the code, category, laterality, and HCC requirement on the rule. Blank fields match every diagnosis. Saving a rule scores every claim again.\nAdd rule\nDelete diagnosis rule\nCancel\nRule\nDescription\nCategory\nCode\nLaterality\nRequires HCC\nEnabled\nActions\nPromise\nName\nRequires HCC eligibility\nLeave blank to match every code.\nLeave blank to match every laterality."
+    },
+    {
+      "path": "/medical-cost-control/claims",
+      "title": "Medical Cost Control | Claims",
+      "label": "Claims",
+      "component": "ClaimsPage",
+      "source": "react-enterprise-client/src/medical-cost-control/claims/ClaimsPage.tsx",
+      "access": "Listed in the primary navigation.",
+      "text": "Filter outcome, procedure, or diagnosis to TRIGGERED or PASSED. Billed-amount filters are dollars. Each page is requested from\nGET /claims\nAdd claim\nDelete claim\nCancel\nClaim\nType\nCode\nCategory\nDescription\nService date\nBilled\nOutcome\nProcedure\nDiagnosis\nActions\nPromise\nClaim number\nCode type\nBilled amount (USD)\nEnter a billed amount of zero dollars or more.\nMust already exist in Procedures or Diagnoses."
+    },
+    {
+      "path": "/medical-cost-control/claim-rules",
+      "title": "Medical Cost Control | Claim Rules",
+      "label": "Claim Rules",
+      "component": "ClaimRulesPage",
+      "source": "react-enterprise-client/src/medical-cost-control/claim-rules/RulesPage.tsx",
+      "access": "Listed in the primary navigation.",
+      "text": "A claim triggers a rule when its billed amount meets the minimum and any type, category, or code on the rule also matches. Blank fields match everything. Saving a rule scores every claim again.\nAdd rule\nDelete rule\nCancel\nName\nType\nCategory\nCode\nMinimum\nEnabled\nDescription\nActions\nPromise\nAny\nCode type\nProcedures\nDiagnoses\nMinimum fee (USD)\nEnter a minimum fee of zero dollars or more.\nLeave blank to match every code."
+    },
+    {
+      "path": "/medical-cost-control",
+      "title": "Medical Cost Control",
+      "label": "Medical Cost Control",
+      "component": "Navigate",
+      "source": "react-enterprise-client/src/shell/AppShell.tsx",
+      "access": "This path is a redirect.",
+      "redirectTo": "/medical-cost-control/overview",
+      "text": "This path redirects to /medical-cost-control/overview."
+    },
+    {
+      "path": "*",
+      "title": "Unknown path",
+      "label": "Unknown path",
+      "component": "Navigate",
+      "source": "react-enterprise-client/src/shell/AppShell.tsx",
+      "access": "This path is a redirect.",
+      "redirectTo": "/",
+      "text": "This path redirects to /."
+    }
+  ]
+}

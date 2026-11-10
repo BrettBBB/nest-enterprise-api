@@ -4,6 +4,13 @@
   "sourceRoot": "src",
   "compilerOptions": {
     "deleteOutDir": true,
-    "outputDir": "dist"
+    "outputDir": "dist",
+    "assets": [
+      {
+        "include": "assistant/artifacts/**/*",
+        "watchAssets": true,
+        "outDir": "dist/src"
+      }
+    ]
   }
 }

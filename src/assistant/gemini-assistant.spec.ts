@@ -43,8 +43,15 @@ describe('GeminiAssistant', () => {
   it('refuses to call Gemini when the API key is missing', async () => {
     process.env.GEMINI_API_KEY = '  ';
 
-    await expect(collect(assistant.answer('Hello', 'Artifacts'))).rejects.toBeInstanceOf(
+    await expect(collect(assistant.answer('Hello', 'Artifacts', [artifact]))).rejects.toBeInstanceOf(
       ServiceUnavailableException,
+    );
+    expect(generateContentStream).not.toHaveBeenCalled();
+  });
+
+  it('refuses to call Gemini when no PDF artifacts were copied', async () => {
+    await expect(collect(assistant.answer('What changed?', 'Artifacts'))).rejects.toThrow(
+      'The engineering artifacts are not available.',
     );
     expect(generateContentStream).not.toHaveBeenCalled();
   });
@@ -54,7 +61,7 @@ describe('GeminiAssistant', () => {
       new ApiError({ message: 'unavailable', status: 503 }),
     );
 
-    await expect(collect(assistant.answer('What changed?', 'Artifacts'))).rejects.toThrow(
+    await expect(collect(assistant.answer('What changed?', 'Artifacts', [artifact]))).rejects.toThrow(
       'Gemini is busy right now. Try again in a moment.',
     );
   });
@@ -67,20 +74,30 @@ describe('GeminiAssistant', () => {
       })(),
     );
 
-    await expect(collect(assistant.answer('What changed?', 'Artifacts'))).resolves.toEqual([
+    await expect(
+      collect(assistant.answer('What changed?', 'Artifacts', [artifact], 'Website page index')),
+    ).resolves.toEqual([
       'Prisma replaced Sequelize',
       ' during a phased migration.',
     ]);
     expect(generateContentStream).toHaveBeenCalledWith({
       model: geminiModel,
-      contents: 'What changed?',
+      contents: [
+        { text: 'Engineering artifact: study.pdf' },
+        { inlineData: { mimeType: 'application/pdf', data: 'cGRm' } },
+        { text: 'Website page index' },
+        { text: 'What changed?' },
+      ],
       config: expect.objectContaining({
         systemInstruction: 'Artifacts',
         automaticContinuation: false,
+        maxOutputTokens: 2048,
       }),
     });
   });
 });
+
+const artifact = { name: 'study.pdf', data: 'cGRm' };
 
 async function collect(stream: AsyncGenerator<string>) {
   const chunks: string[] = [];

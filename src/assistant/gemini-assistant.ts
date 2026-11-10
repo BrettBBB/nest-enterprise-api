@@ -1,20 +1,32 @@
-import { ApiError, GoogleGenAI } from '@google/genai';
+import { ApiError, GoogleGenAI, type Part } from '@google/genai';
 import {
   BadGatewayException,
   HttpException,
   Injectable,
   ServiceUnavailableException,
 } from '@nestjs/common';
+import type { EngineeringArtifact } from './artifacts.js';
 
 export const geminiModel = 'gemini-3.5-flash-lite';
 
 @Injectable()
 export class GeminiAssistant {
-  async *answer(question: string, instruction: string): AsyncGenerator<string> {
+  async *answer(
+    question: string,
+    instruction: string,
+    artifacts: EngineeringArtifact[] = [],
+    context = '',
+  ): AsyncGenerator<string> {
     const apiKey = process.env.GEMINI_API_KEY?.trim();
     if (!apiKey) {
       throw new ServiceUnavailableException(
         'The architecture assistant is not configured.',
+      );
+    }
+
+    if (artifacts.length === 0) {
+      throw new ServiceUnavailableException(
+        'The engineering artifacts are not available.',
       );
     }
 
@@ -23,11 +35,11 @@ export class GeminiAssistant {
     try {
       const stream = await ai.models.generateContentStream({
         model: geminiModel,
-        contents: question,
+        contents: artifactContents(question, artifacts, context),
         config: {
           systemInstruction: instruction,
           temperature: 0.2,
-          maxOutputTokens: 1024,
+          maxOutputTokens: 2048,
           automaticContinuation: false,
         },
       });
@@ -57,4 +69,24 @@ export class GeminiAssistant {
       throw new BadGatewayException('The assistant returned an empty answer.');
     }
   }
+}
+
+function artifactContents(
+  question: string,
+  artifacts: EngineeringArtifact[],
+  context: string,
+): Part[] {
+  return [
+    ...artifacts.flatMap((artifact) => [
+      { text: `Engineering artifact: ${artifact.name}` },
+      {
+        inlineData: {
+          mimeType: 'application/pdf',
+          data: artifact.data,
+        },
+      },
+    ]),
+    ...(context ? [{ text: context }] : []),
+    { text: question },
+  ];
 }

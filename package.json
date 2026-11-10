@@ -12,7 +12,9 @@
     "prisma:deploy": "dotenv run -f .env.production --override -- prisma migrate deploy",
     "prisma:studio": "node scripts/studio.mjs",
     "prisma:seed": "pnpm exec tsc --pretty false && node dist/src/seed.js",
-    "prebuild": "pnpm prisma:generate",
+    "artifacts:copy": "node scripts/copy-engineering-artifacts.mjs",
+    "site:index": "node scripts/index-site.mjs",
+    "prebuild": "pnpm prisma:generate && pnpm site:index",
     "build": "nest build",
     "deploy": "nest deploy",
     "format": "prettier --write \"src/**/*.ts\" \"test/**/*.ts\"",
@@ -26,7 +28,7 @@
     "test:cov": "vitest run --coverage",
     "test:debug": "vitest --inspect-brk --no-file-parallelism",
     "test:e2e": "vitest run --config ./vitest.config.e2e.ts",
-    "all": "pnpm install && prisma generate && prisma migrate dev && prisma migrate dev && prisma deploy && pnpm build && pnpm lint && pnpm test"
+    "all": "pnpm install && pnpm prisma:migrate && pnpm prebuild && pnpm exec nest build && pnpm lint && pnpm test"
   },
   "dependencies": {
     "@google/genai": "^3.0.0",
